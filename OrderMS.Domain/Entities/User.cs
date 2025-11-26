@@ -7,5 +7,8 @@ namespace OrderMS.Domain.Entities
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string? Address { get; set; }
+
+        public Guid? CustomerId { get; set; }
+        public Customer? Customer { get; set; }
     }
 }
