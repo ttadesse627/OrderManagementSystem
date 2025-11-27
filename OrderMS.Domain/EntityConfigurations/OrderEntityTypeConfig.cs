@@ -4,7 +4,7 @@ using OrderMS.Domain.Entities;
 
 namespace OrderMS.Domain.EntityConfigurations;
 
-public class OrderEntityConfig : IEntityTypeConfiguration<Order>
+public class OrderEntityTypeConfig : IEntityTypeConfiguration<Order>
 {
     public void Configure(EntityTypeBuilder<Order> builder)
     {

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OrderMS.Domain.Entities;
 namespace OrderMS.Domain.EntityConfigurations;
 
-public class ItemEntityConfig : IEntityTypeConfiguration<Item>
+public class ItemEntityTypeConfig : IEntityTypeConfiguration<Item>
 {
     public void Configure(EntityTypeBuilder<Item> builder)
     {
