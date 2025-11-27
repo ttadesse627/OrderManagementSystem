@@ -1,0 +1,49 @@
+using MediatR;
+using OrderMS.Application.Dtos.Requests;
+using OrderMS.Application.Dtos.Responses;
+using OrderMS.Application.Services;
+using OrderMS.Domain.Entities;
+
+namespace OrderMS.Application.Features.Users.Commands;
+
+public record LoginCommand(string Email, string Password) : IRequest<AuthResponse>;
+public class LoginCommandHandler(IIdentityService identityService, ITokenGeneratorService tokenGeneratorService) : IRequestHandler<LoginCommand, AuthResponse>
+{
+    private readonly IIdentityService _identityService = identityService;
+    private readonly ITokenGeneratorService _tokenGeneratorService = tokenGeneratorService;
+    public async Task<AuthResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
+    {
+        var authResponse = new AuthResponse();
+
+        if (string.IsNullOrEmpty(request.Email))
+        {
+            throw new ArgumentException("Email cannot be null or empty", nameof(request.Email));
+        }
+
+        if (string.IsNullOrEmpty(request.Password))
+        {
+            throw new ArgumentException("Email cannot be null or empty", nameof(request.Password));
+        }
+        var isAuthenticated = await _identityService.AuthenticateUserAsync(request.Email, request.Password);
+        if (!isAuthenticated)
+        {
+            throw new UnauthorizedAccessException("Invalid email or password.");
+        }
+
+        var user = await _identityService.GetUserByEmailAsync(request.Email);
+        if (user == null)
+        {
+            throw new KeyNotFoundException("Invalid email or password.");
+        }
+
+        var token = _tokenGeneratorService.GenerateToken(user);
+
+        authResponse.UserId = user.Id;
+        authResponse.Email = user.Email ?? string.Empty;
+        authResponse.FirstName = user.FirstName;
+        authResponse.LastName = user.LastName;
+        authResponse.Token = token;
+
+        return await Task.FromResult(authResponse);
+    }
+}
