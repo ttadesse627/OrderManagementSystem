@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
 using OrderMS.Domain.Utilities;
+using OrderMS.Infrastructure.Persistence;
 
 namespace OrderMS.Infrastructure;
 
@@ -16,6 +18,7 @@ public static class ServiceContainer
     {
         services.ConfigureDbContext(configuration);
         services.ConfigureIdentity(configuration);
+        services.AddRepositories();
 
         return services;
     }
@@ -77,6 +80,14 @@ public static class ServiceContainer
                     : TimeSpan.Zero
             };
         });
+
+        return services;
+    }
+
+    public static IServiceCollection AddRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
 
         return services;
     }
