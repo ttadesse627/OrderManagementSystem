@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using OrderMS.Application.Dtos.Requests;
 using OrderMS.Application.Dtos.Responses;
 using OrderMS.Application.Features.Users.Commands;
 
@@ -11,8 +12,8 @@ public class AuthController(ISender sender) : ControllerBase
 {
     private readonly ISender _sender = sender;
     [HttpPost("login")]
-    public async Task<ActionResult<AuthResponse>> Login(string email, string password)
+    public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest loginRequest)
     {
-        return Ok(await _sender.Send(new LoginCommand(email, password)));
+        return Ok(await _sender.Send(new LoginCommand(loginRequest)));
     }
 }

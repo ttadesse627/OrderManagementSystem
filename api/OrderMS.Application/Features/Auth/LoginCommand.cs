@@ -2,11 +2,10 @@ using MediatR;
 using OrderMS.Application.Dtos.Requests;
 using OrderMS.Application.Dtos.Responses;
 using OrderMS.Application.Services;
-using OrderMS.Domain.Entities;
 
 namespace OrderMS.Application.Features.Users.Commands;
 
-public record LoginCommand(string Email, string Password) : IRequest<AuthResponse>;
+public record LoginCommand(LoginRequest Request) : IRequest<AuthResponse>;
 public class LoginCommandHandler(IIdentityService identityService, ITokenGeneratorService tokenGeneratorService) : IRequestHandler<LoginCommand, AuthResponse>
 {
     private readonly IIdentityService _identityService = identityService;
@@ -15,22 +14,22 @@ public class LoginCommandHandler(IIdentityService identityService, ITokenGenerat
     {
         var authResponse = new AuthResponse();
 
-        if (string.IsNullOrEmpty(request.Email))
+        if (string.IsNullOrEmpty(request.Request.Email))
         {
-            throw new ArgumentException("Email cannot be null or empty", nameof(request.Email));
+            throw new ArgumentException("Email cannot be null or empty", nameof(request.Request.Email));
         }
 
-        if (string.IsNullOrEmpty(request.Password))
+        if (string.IsNullOrEmpty(request.Request.Password))
         {
-            throw new ArgumentException("Email cannot be null or empty", nameof(request.Password));
+            throw new ArgumentException("Email cannot be null or empty", nameof(request.Request.Password));
         }
-        var isAuthenticated = await _identityService.AuthenticateUserAsync(request.Email, request.Password);
+        var isAuthenticated = await _identityService.AuthenticateUserAsync(request.Request.Email, request.Request.Password);
         if (!isAuthenticated)
         {
             throw new UnauthorizedAccessException("Invalid email or password.");
         }
 
-        var user = await _identityService.GetUserByEmailAsync(request.Email);
+        var user = await _identityService.GetUserByEmailAsync(request.Request.Email);
         if (user == null)
         {
             throw new KeyNotFoundException("Invalid email or password.");
