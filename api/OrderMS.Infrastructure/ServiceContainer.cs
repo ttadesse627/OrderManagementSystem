@@ -87,7 +87,12 @@ public static class ServiceContainer
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IIdentityService, IdentityService>();
-        services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
+        services.AddTransient<ITokenGeneratorService, TokenGeneratorService>();
+
+        services.AddTransient(typeof(ICommonRepository<>), typeof(CommonRepository<>));
+        services.AddTransient<IItemRepository, ItemRepository>();
+        services.AddTransient<ICategoryRepository, CategoryRepository>();
+
 
         return services;
     }
