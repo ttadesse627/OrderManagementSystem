@@ -8,9 +8,8 @@ namespace OrderMS.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(ISender sender) : ControllerBase
+public class UserController : ApiControllerBase
 {
-    private readonly ISender _sender = sender;
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponse>> Register(RegisterRequest registerRequest)
     {
