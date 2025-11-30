@@ -1,4 +1,3 @@
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using OrderMS.Application.Dtos.Requests;
 using OrderMS.Application.Dtos.Responses;
