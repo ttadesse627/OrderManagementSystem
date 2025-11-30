@@ -35,7 +35,7 @@ public class LoginCommandHandler(IIdentityService identityService, ITokenGenerat
             throw new KeyNotFoundException("Invalid email or password.");
         }
 
-        var token = _tokenGeneratorService.GenerateToken(user);
+        var token = await _tokenGeneratorService.GenerateTokenAsync(user);
 
         authResponse.UserId = user.Id;
         authResponse.Email = user.Email ?? string.Empty;
