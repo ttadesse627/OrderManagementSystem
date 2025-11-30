@@ -1,4 +1,5 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Diagnostics;
+using Microsoft.AspNetCore.Http.Features;
 using OrderMS.Api.Middlewares;
 using OrderMS.Application;
 using OrderMS.Infrastructure;
@@ -6,16 +7,16 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-
 string allowSpecificOrigins = "_allowSpecificoOrigins";
 
-builder.Services.AddProblemDetails(configure =>
+builder.Services.AddProblemDetails(o =>
 {
-    configure.CustomizeProblemDetails = context =>
+    o.CustomizeProblemDetails = context =>
     {
+        context.ProblemDetails.Instance = $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
         context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
+        Activity? activity = context.HttpContext.Features.Get<IHttpActivityFeature>()?.Activity;
+        context.ProblemDetails.Extensions.TryAdd("traceId", activity?.Id);
     };
 });
 
@@ -54,12 +55,17 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandler();
+
 app.UseHttpsRedirection();
+
+app.UseStatusCodePages();
 
 app.UseCors(allowSpecificOrigins);
 
 app.UseAuthentication();
+
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
