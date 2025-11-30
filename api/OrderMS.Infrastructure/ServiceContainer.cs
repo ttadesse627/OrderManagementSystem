@@ -1,5 +1,6 @@
 
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -49,6 +50,7 @@ public static class ServiceContainer
         {
             options.User.RequireUniqueEmail = true;
             options.Password.RequireDigit = true;
+            options.User.AllowedUserNameCharacters = "";
             options.Password.RequireLowercase = true;
             options.Password.RequireUppercase = true;
             options.Password.RequireNonAlphanumeric = false;
@@ -57,29 +59,25 @@ public static class ServiceContainer
         .AddRoles<IdentityRole<Guid>>()
         .AddEntityFrameworkStores<ApplicationDbContext>();
 
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-            options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
-            options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-        }).AddJwtBearer("bearer", jwtOptions =>
-        {
-            jwtOptions.RequireHttpsMetadata = false;
-            jwtOptions.SaveToken = true;
-            jwtOptions.TokenValidationParameters = new TokenValidationParameters
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(jwtOptions =>
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings.Issuer,
-                ValidAudience = jwtSettings.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
-                ClockSkew = jwtSettings.ExpiryInMinutes > 0
-                    ? TimeSpan.FromMinutes(jwtSettings.ExpiryInMinutes)
-                    : TimeSpan.Zero
-            };
-        });
+                jwtOptions.RequireHttpsMetadata = false;
+                jwtOptions.SaveToken = true;
+                jwtOptions.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+                    ClockSkew = jwtSettings.ExpiryInMinutes > 0
+                        ? TimeSpan.FromMinutes(jwtSettings.ExpiryInMinutes)
+                        : TimeSpan.Zero
+                };
+            });
+
+        services.AddAuthorization();
+
+        services.AddHttpContextAccessor();
 
         return services;
     }
