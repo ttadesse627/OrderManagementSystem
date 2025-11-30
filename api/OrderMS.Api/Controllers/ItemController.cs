@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderMS.Application.Dtos.Requests;
 using OrderMS.Application.Dtos.Responses;
@@ -6,12 +7,15 @@ using OrderMS.Application.Features.Items.Queries;
 
 namespace OrderMS.Api.Controllers;
 
-public class ItemController : ControllerBase
+[ApiController]
+[Route("api/[controller]")]
+public class ItemController : ApiControllerBase
 {
+    [Authorize(Roles = "User, Admin")]
     [HttpPost("create")]
     public async Task<ActionResult<ApiResponse<Guid>>> Create([FromBody] ItemRequest itemRequest)
     {
-        return Created(string.Empty, new CreateItemCommand(itemRequest));
+        return Created(string.Empty, await _sender.Send(new CreateItemCommand(itemRequest)));
     }
 
     [HttpGet(Name = "GetItems")]
@@ -21,6 +25,6 @@ public class ItemController : ControllerBase
         string? sortBy = null,
         bool sortDescending = false)
     {
-        return Ok(new GetItemsQuery(currentPage, pageSize, sortBy, sortDescending));
+        return Ok(await _sender.Send(new GetItemsQuery(currentPage, pageSize, sortBy, sortDescending)));
     }
 }
