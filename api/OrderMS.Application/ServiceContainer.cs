@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using OrderMS.Application.Services;
 
 namespace OrderMS.Application;
 
@@ -8,6 +9,7 @@ public static class ServiceContainer
     {
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ServiceContainer).Assembly));
 
+        services.AddHostedService<FileProcessorService>();
         return services;
     }
 }
