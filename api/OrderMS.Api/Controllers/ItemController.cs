@@ -13,9 +13,9 @@ public class ItemController : ApiControllerBase
 {
     [Authorize(Roles = "User, Admin")]
     [HttpPost("create")]
-    public async Task<ActionResult<ApiResponse<Guid>>> Create([FromBody] ItemRequest itemRequest)
+    public async Task<ActionResult<ApiResponse<Guid>>> Create([FromForm] ItemRequest itemRequest, [FromForm] IFormFile itemImage)
     {
-        return Created(string.Empty, await _sender.Send(new CreateItemCommand(itemRequest)));
+        return Created(string.Empty, await _sender.Send(new CreateItemCommand(itemRequest, itemImage)));
     }
 
     [HttpGet(Name = "GetItems")]

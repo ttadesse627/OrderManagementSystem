@@ -1,9 +1,11 @@
 
+
 namespace OrderMS.Application.Dtos.Requests;
 
-public record ItemRequest(
-    string Name,
-    decimal Price,
-    int StockQuantity,
-    Guid CategoryId
-);
+public record ItemRequest
+{
+    public required string Name { get; set; }
+    public decimal Price { get; set; }
+    public int StockQuantity { get; set; }
+    public Guid CategoryId { get; set; }
+};
