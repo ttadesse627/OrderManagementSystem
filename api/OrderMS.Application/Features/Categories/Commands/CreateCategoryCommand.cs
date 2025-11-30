@@ -12,7 +12,7 @@ public class CreateCategoryCommandHandler(ICategoryRepository categoryRepository
     private readonly ICategoryRepository _categoryRepository = categoryRepository;
     public async Task<ApiResponse<Guid>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
-        ApiResponse<Guid> response = new(Guid.Empty, false);
+        ApiResponse<Guid> response = new();
 
         if (string.IsNullOrWhiteSpace(request.CategoryRequest.Name))
         {
@@ -30,7 +30,9 @@ public class CreateCategoryCommandHandler(ICategoryRepository categoryRepository
 
         if (result > 0)
         {
-            response = new(category.Id, true, "Category created successfully.");
+            response.Data = category.Id;
+            response.Success = true;
+            response.Message = "Category created successfully.";
         }
 
         return await Task.FromResult(response);

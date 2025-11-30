@@ -13,7 +13,7 @@ public class CreateItemCommandHandler(IItemRepository itemRepository) : IRequest
     public async Task<ApiResponse<Guid>> Handle(CreateItemCommand request, CancellationToken cancellationToken)
     {
         var itemValidator = new CreateItemCommandValidator();
-        ApiResponse<Guid> response = new(Guid.Empty, false);
+        ApiResponse<Guid> response = new();
 
         var validationResult = await itemValidator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
@@ -31,7 +31,12 @@ public class CreateItemCommandHandler(IItemRepository itemRepository) : IRequest
         var createResult = await _itemRepository.SaveChangesAsync(cancellationToken);
         if (createResult > 0)
         {
-            response = new(item.Id, true, "Item created successfully.");
+            if (createResult > 0)
+            {
+                response.Data = item.Id;
+                response.Success = true;
+                response.Message = "Item created successfully.";
+            }
         }
 
         return await Task.FromResult(response);
