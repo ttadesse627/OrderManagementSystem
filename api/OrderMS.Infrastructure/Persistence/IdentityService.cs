@@ -1,4 +1,8 @@
+using System.Security.Claims;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.JsonWebTokens;
 using OrderMS.Application.Dtos.Responses;
 using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
@@ -10,40 +14,54 @@ namespace OrderMS.Infrastructure.Persistence
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager = roleManager;
 
-        public async Task<bool> CreateUserAsync(ApplicationUser user, IList<Guid> roles, string password)
+        public async Task<ApiResponse<int>> CreateUserAsync(ApplicationUser user, IList<Guid> roleIds, string password)
         {
-            if (user == null)
-                throw new ArgumentNullException(nameof(user));
+            var response = new ApiResponse<int>();
+
+            ArgumentNullException.ThrowIfNull(user);
             if (string.IsNullOrWhiteSpace(password))
                 throw new ArgumentNullException(nameof(password));
+
+            var existingUser = await _userManager.FindByEmailAsync(user.Email!);
+            if (existingUser != null)
+            {
+                response.Message += "user with the given email already exists";
+                throw new ValidationException("user with the given email already exists");
+            }
 
             var result = await _userManager.CreateAsync(user, password);
 
             if (!result.Succeeded)
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                return false;
+                response.Errors = [.. result.Errors.Select(er => er.Description)];
+                throw new InvalidOperationException(string.Join("; ", result.Errors));
             }
 
-            if (roles != null && roles.Any())
+            var roleNames = await _roleManager.Roles.Where(role => roleIds.Contains(role.Id)).Select(r => r.Name).ToListAsync();
+            if (roleNames.Count != 0)
             {
-                foreach (var roleId in roles)
-                {
-                    var role = await _roleManager.FindByIdAsync(roleId.ToString());
-                    if (role == null)
-                        throw new ArgumentException($"Role with id '{roleId}' not found.", nameof(roles));
-
-                    var addToRoleResult = await _userManager.AddToRoleAsync(user, role.Name ?? string.Empty);
-                    if (!addToRoleResult.Succeeded)
-                    {
-                        var addErrors = string.Join(", ", addToRoleResult.Errors.Select(e => e.Description));
-                        // Optionally rollback user creation here. For now report failure.
-                        return false;
-                    }
-                }
+                await _userManager.AddToRolesAsync(user, roleNames);
             }
 
-            return true;
+            List<Claim> claims = [
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
+            ];
+
+            claims.AddRange(roleNames.Select(r => new Claim(ClaimTypes.Role, r ?? string.Empty)));
+
+
+            var claimResult = await _userManager.AddClaimsAsync(user, claims);
+            if (!claimResult.Succeeded)
+            {
+                response.Errors.AddRange(claimResult.Errors.Select(err => err.Description));
+                await _userManager.DeleteAsync(user);
+            }
+            Console.WriteLine("user's claims added successfully");
+            response.Success = true;
+
+            return response;
+
         }
 
         public async Task<bool> AuthenticateUserAsync(string email, string password)
@@ -76,7 +94,7 @@ namespace OrderMS.Infrastructure.Persistence
             return await _userManager.FindByEmailAsync(email);
         }
 
-        public async Task<bool> CreateRoleAsync(IList<string> roleNames)
+        public async Task<bool> CreateRolesAsync(IList<string> roleNames)
         {
             if (roleNames == null || !roleNames.Any())
                 throw new ArgumentNullException(nameof(roleNames));
