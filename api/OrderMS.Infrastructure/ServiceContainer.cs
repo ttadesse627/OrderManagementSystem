@@ -10,6 +10,7 @@ using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
 using OrderMS.Domain.Utilities;
 using OrderMS.Infrastructure.Persistence;
+using OrderMS.Infrastructure.Services;
 
 namespace OrderMS.Infrastructure;
 
@@ -84,13 +85,14 @@ public static class ServiceContainer
 
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
+        services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddTransient<ITokenGeneratorService, TokenGeneratorService>();
 
         services.AddTransient(typeof(ICommonRepository<>), typeof(CommonRepository<>));
         services.AddTransient<IItemRepository, ItemRepository>();
+        services.AddTransient<IFileService, FileService>();
         services.AddTransient<ICategoryRepository, CategoryRepository>();
-
 
         return services;
     }
