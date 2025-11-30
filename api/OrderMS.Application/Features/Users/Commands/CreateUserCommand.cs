@@ -22,6 +22,7 @@ public class CreateUserCommandHandler(IIdentityService identityService, ITokenGe
             FirstName = request.RegisterRequest.FirstName,
             LastName = request.RegisterRequest.LastName,
             Email = request.RegisterRequest.Email,
+            UserName = request.RegisterRequest.Email
         };
 
         var createResult = await _identityService.CreateUserAsync(
@@ -30,9 +31,9 @@ public class CreateUserCommandHandler(IIdentityService identityService, ITokenGe
             request.RegisterRequest.Password
         );
 
-        if (createResult)
+        if (createResult.Success)
         {
-            var token = _tokenGeneratorService.GenerateToken(user);
+            var token = await _tokenGeneratorService.GenerateTokenAsync(user);
             authResponse.UserId = user.Id;
             authResponse.Email = user.Email;
             authResponse.FirstName = user.FirstName;
