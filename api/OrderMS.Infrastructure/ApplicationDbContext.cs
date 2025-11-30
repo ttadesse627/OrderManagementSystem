@@ -1,13 +1,17 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.JsonWebTokens;
 using OrderMS.Domain.Entities;
 using OrderMS.Domain.EntityConfigurations;
 
 namespace OrderMS.Infrastructure;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-: IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
+: IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid, IdentityUserClaim<Guid>,
+                    IdentityUserRole<Guid>, IdentityUserLogin<Guid>,
+                    IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>(options)
 {
     public DbSet<Category> Categories { get; set; }
     public DbSet<Customer> Customers { get; set; }
@@ -49,7 +53,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             new IdentityRole<Guid>
             {
                 Id = Guid.Parse("c6bcfdb3-56a3-4bda-b6d5-1016f51b19cd"),
-                Name = "Cutomer",
+                Name = "Customer",
                 NormalizedName = "CUSTOMER"
             }
         );
@@ -78,6 +82,30 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             {
                 UserId = Guid.Parse("2d7b6f3e-3c4e-4f5a-9f7b-8e9d6c4b5a1c"),
                 RoleId = Guid.Parse("1cb8056d-ee6e-4320-9618-2ffa4946e11e")
+            }
+        );
+
+        modelBuilder.Entity<IdentityUserClaim<Guid>>().HasData(
+            new IdentityUserClaim<Guid>
+            {
+                Id = 1,
+                UserId = Guid.Parse("2d7b6f3e-3c4e-4f5a-9f7b-8e9d6c4b5a1c"),
+                ClaimType = JwtRegisteredClaimNames.Sub,
+                ClaimValue = "2d7b6f3e-3c4e-4f5a-9f7b-8e9d6c4b5a1c"
+            },
+            new IdentityUserClaim<Guid>
+            {
+                Id = 2,
+                UserId = Guid.Parse("2d7b6f3e-3c4e-4f5a-9f7b-8e9d6c4b5a1c"),
+                ClaimType = JwtRegisteredClaimNames.Email,
+                ClaimValue = "admin@test.com"
+            },
+            new IdentityUserClaim<Guid>
+            {
+                Id = 3,
+                UserId = Guid.Parse("2d7b6f3e-3c4e-4f5a-9f7b-8e9d6c4b5a1c"),
+                ClaimType = ClaimTypes.Role,
+                ClaimValue = "Admin"
             }
         );
     }
