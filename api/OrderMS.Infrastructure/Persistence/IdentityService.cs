@@ -37,7 +37,11 @@ namespace OrderMS.Infrastructure.Persistence
                 throw new InvalidOperationException(string.Join("; ", result.Errors));
             }
 
-            var roleNames = await _roleManager.Roles.Where(role => roleIds.Contains(role.Id)).Select(r => r.Name).ToListAsync();
+            var roleNames = await _roleManager.Roles
+                .Where(role => roleIds.Contains(role.Id))
+                .Select(r => r.Name ?? string.Empty)
+                .ToListAsync();
+
             if (roleNames.Count != 0)
             {
                 await _userManager.AddToRolesAsync(user, roleNames);
@@ -57,11 +61,10 @@ namespace OrderMS.Infrastructure.Persistence
                 response.Errors.AddRange(claimResult.Errors.Select(err => err.Description));
                 await _userManager.DeleteAsync(user);
             }
-            Console.WriteLine("user's claims added successfully");
+
             response.Success = true;
 
             return response;
-
         }
 
         public async Task<bool> AuthenticateUserAsync(string email, string password)
