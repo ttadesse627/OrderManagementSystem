@@ -6,5 +6,5 @@ namespace OrderMS.Application.Services;
 
 public interface ITokenGeneratorService
 {
-    string GenerateToken(ApplicationUser user);
+    Task<string> GenerateTokenAsync(ApplicationUser user);
 }
