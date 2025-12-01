@@ -1,6 +1,6 @@
 using MediatR;
-using OrderMS.Application.Dtos.Requests;
-using OrderMS.Application.Dtos.Responses;
+using OrderMS.Application.Dtos.Categories.Requests;
+using OrderMS.Application.Dtos.Common.Responses;
 using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
 

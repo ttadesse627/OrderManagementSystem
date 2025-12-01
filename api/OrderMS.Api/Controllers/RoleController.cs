@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OrderMS.Application.Dtos.Responses;
+using OrderMS.Application.Dtos.Common.Responses;
+using OrderMS.Application.Dtos.Users.Responses;
 using OrderMS.Application.Services;
 
 namespace OrderMS.Api.Controllers;

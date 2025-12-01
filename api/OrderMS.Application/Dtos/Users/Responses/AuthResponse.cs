@@ -1,6 +1,6 @@
 
 
-namespace OrderMS.Application.Dtos.Responses;
+namespace OrderMS.Application.Dtos.Users.Responses;
 
 public class AuthResponse
 {

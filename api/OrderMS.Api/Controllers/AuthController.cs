@@ -1,7 +1,6 @@
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using OrderMS.Application.Dtos.Requests;
-using OrderMS.Application.Dtos.Responses;
+using OrderMS.Application.Dtos.Users.Requests;
+using OrderMS.Application.Dtos.Users.Responses;
 using OrderMS.Application.Features.Users.Commands;
 
 namespace OrderMS.Api.Controllers;

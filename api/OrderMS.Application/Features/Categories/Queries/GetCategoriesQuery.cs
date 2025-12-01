@@ -1,5 +1,5 @@
 using MediatR;
-using OrderMS.Application.Dtos.Responses;
+using OrderMS.Application.Dtos.Categories.Responses;
 using OrderMS.Application.Services;
 
 namespace OrderMS.Application.Features.Categories.Queries;

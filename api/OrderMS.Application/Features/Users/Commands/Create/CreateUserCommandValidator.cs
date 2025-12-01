@@ -3,7 +3,7 @@
 
 using FluentValidation;
 
-namespace OrderMS.Application.Features.Users.Commands;
+namespace OrderMS.Application.Features.Users.Commands.Create;
 
 public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {

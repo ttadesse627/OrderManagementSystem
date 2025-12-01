@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.Http;
 
-
-namespace OrderMS.Application.Dtos.Requests;
+namespace OrderMS.Application.Dtos.Items.Requests;
 
 public record ItemRequest
 {
@@ -8,4 +8,5 @@ public record ItemRequest
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
     public Guid CategoryId { get; set; }
+    public IFormFile? ItemImage { get; set; }
 };

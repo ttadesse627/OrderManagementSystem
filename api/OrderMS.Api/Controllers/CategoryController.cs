@@ -1,8 +1,7 @@
-using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using OrderMS.Application.Dtos.Requests;
-using OrderMS.Application.Dtos.Responses;
+using OrderMS.Application.Dtos.Categories.Requests;
+using OrderMS.Application.Dtos.Categories.Responses;
+using OrderMS.Application.Dtos.Common.Responses;
 using OrderMS.Application.Features.Categories.Commands;
 using OrderMS.Application.Features.Categories.Queries;
 
@@ -22,13 +21,13 @@ public class CategoryController : ApiControllerBase
         }
         return CreatedAtAction(nameof(GetById), new { Id = apiResponse.Data }, apiResponse);
     }
-    [HttpGet("categories")]
+    [HttpGet(Name = "Categories")]
     public async Task<ActionResult<List<CategoryDto>>> Get()
     {
         return Ok(await _sender.Send(new GetCategoriesQuery()));
     }
 
-    [HttpGet("categories/{id}")]
+    [HttpGet("{id}")]
     public async Task<ActionResult<CategoryDto>> GetById(Guid id)
     {
         return Ok(await _sender.Send(new GetCategoryByIdQuery(id)));

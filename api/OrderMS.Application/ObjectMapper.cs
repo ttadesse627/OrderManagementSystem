@@ -1,5 +1,5 @@
 using Mapster;
-using OrderMS.Application.Dtos.Responses;
+using OrderMS.Application.Dtos.Items.Responses;
 using OrderMS.Domain.Entities;
 
 namespace OrderMS.Application;

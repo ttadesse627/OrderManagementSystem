@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OrderMS.Application.Dtos.Requests;
-using OrderMS.Application.Dtos.Responses;
+using OrderMS.Application.Dtos.Common.Responses;
+using OrderMS.Application.Dtos.Items.Requests;
 using OrderMS.Application.Features.Items.Commands;
 using OrderMS.Application.Features.Items.Queries;
 
@@ -9,13 +9,19 @@ namespace OrderMS.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ItemController : ApiControllerBase
+public class ItemController(ILogger<ItemController> logger) : ApiControllerBase
 {
+    private readonly ILogger<ItemController> _logger = logger;
+
     [Authorize(Roles = "User, Admin")]
     [HttpPost("create")]
-    public async Task<ActionResult<ApiResponse<Guid>>> Create([FromForm] ItemRequest itemRequest, [FromForm] IFormFile itemImage)
+    public async Task<ActionResult<ApiResponse<Guid>>> Create([FromForm] ItemRequest itemRequest)
     {
-        return Created(string.Empty, await _sender.Send(new CreateItemCommand(itemRequest, itemImage)));
+        if (itemRequest.ItemImage == null)
+        {
+            _logger.LogError("File is missing");
+        }
+        return Created(string.Empty, await _sender.Send(new CreateItemCommand(itemRequest)));
     }
 
     [HttpGet(Name = "GetItems")]

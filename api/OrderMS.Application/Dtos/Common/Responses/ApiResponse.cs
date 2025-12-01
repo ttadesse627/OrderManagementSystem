@@ -1,6 +1,6 @@
 
 
-namespace OrderMS.Application.Dtos.Responses;
+namespace OrderMS.Application.Dtos.Common.Responses;
 
 public record ApiResponse<T>
 {

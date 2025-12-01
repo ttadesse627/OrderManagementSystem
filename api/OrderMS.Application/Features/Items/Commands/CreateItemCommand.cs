@@ -1,14 +1,13 @@
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using OrderMS.Application.Dtos.Requests;
-using OrderMS.Application.Dtos.Responses;
+using OrderMS.Application.Dtos.Common.Responses;
+using OrderMS.Application.Dtos.Items.Requests;
 using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
 
 namespace OrderMS.Application.Features.Items.Commands;
 
-public record CreateItemCommand(ItemRequest ItemRequest, IFormFile itemImage) : IRequest<ApiResponse<Guid>>;
+public record CreateItemCommand(ItemRequest ItemRequest) : IRequest<ApiResponse<Guid>>;
 public class CreateItemCommandHandler(IItemRepository itemRepository, IFileService fileService, IBackgroundTaskQueue queue) : IRequestHandler<CreateItemCommand, ApiResponse<Guid>>
 {
     private readonly IItemRepository _itemRepository = itemRepository;
@@ -25,12 +24,8 @@ public class CreateItemCommandHandler(IItemRepository itemRepository, IFileServi
             throw new ApplicationException(string.Join(";", validationResult.Errors.Select(er => er.ErrorMessage)));
         }
 
-        var (succes, errorMessage) = request.itemImage == null ? (false, string.Empty) :
-            _fileService.IsValid(request.itemImage);
-        if (!validationResult.IsValid)
-        {
-            throw new ValidationException(errorMessage);
-        }
+        var (succes, errorMessage) = request.ItemRequest.ItemImage == null ? (false, string.Empty) :
+            _fileService.IsValid(request.ItemRequest.ItemImage);
 
         var item = new Item
         {
@@ -47,11 +42,25 @@ public class CreateItemCommandHandler(IItemRepository itemRepository, IFileServi
             response.Success = true;
             response.Message = "Item created successfully.";
 
-            // Save file in background
-            _queue.QueueBackgroundTaskItem(async cancellationToken =>
+            if (succes)
             {
-                await _fileService.UploadAsync(request.itemImage!, item.Id);
-            });
+                await _fileService.UploadAsync(request.ItemRequest.ItemImage!, item.Id);
+                // _ = Task.Run(async () =>
+                // {
+                //     await _fileService.UploadAsync(request.ItemRequest.ItemImage!, item.Id);
+                // }, cancellationToken);
+            }
+
+            else
+            {
+                throw new ValidationException(string.Join(";", validationResult.Errors.Select(er => er.ErrorMessage)));
+            }
+
+            // Save file in background
+            // _queue.QueueBackgroundTaskItem(async cancellationToken =>
+            // {
+            //     await _fileService.UploadAsync(request.ItemRequest.ItemImage!, item.Id);
+            // });
         }
 
         return await Task.FromResult(response);
