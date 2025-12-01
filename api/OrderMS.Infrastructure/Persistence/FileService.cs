@@ -1,14 +1,14 @@
 
-
-using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.Logging;
 using OrderMS.Application.Services;
 
 namespace OrderMS.Infrastructure.Persistence;
 
-public class FileService : IFileService
+public class FileService(ILogger<FileService> logger) : IFileService
 {
+    private readonly ILogger<FileService> _logger = logger;
+
     public async Task UploadAsync(IFormFile file, Guid id)
     {
         string extension = Path.GetExtension(file.FileName);
@@ -16,8 +16,16 @@ public class FileService : IFileService
         //File saving
         string fileName = id.ToString() + extension;
         string pathToSave = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
-        using FileStream fileStream = new(Path.Combine(pathToSave, fileName), FileMode.Create);
-        await file.CopyToAsync(fileStream);
+
+        try
+        {
+            await using FileStream fileStream = new(Path.Combine(pathToSave, fileName), FileMode.Create);
+            await file.CopyToAsync(fileStream);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Error occurred while trying to save file.");
+        }
     }
     public Task<IFormFile> RetrieveAsync(Guid id)
     {
