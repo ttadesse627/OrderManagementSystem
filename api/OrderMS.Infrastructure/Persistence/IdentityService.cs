@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
-using OrderMS.Application.Dtos.Responses;
+using OrderMS.Application.Dtos.Common.Responses;
+using OrderMS.Application.Dtos.Users.Responses;
 using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
 
@@ -14,7 +14,7 @@ namespace OrderMS.Infrastructure.Persistence
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager = roleManager;
 
-        public async Task<ApiResponse<int>> CreateUserAsync(ApplicationUser user, IList<Guid> roleIds, string password)
+        public async Task<ApiResponse<int>> CreateUserAsync(ApplicationUser user, IList<string> roles, string password)
         {
             var response = new ApiResponse<int>();
 
@@ -37,14 +37,9 @@ namespace OrderMS.Infrastructure.Persistence
                 throw new InvalidOperationException(string.Join("; ", result.Errors));
             }
 
-            var roleNames = await _roleManager.Roles
-                .Where(role => roleIds.Contains(role.Id))
-                .Select(r => r.Name ?? string.Empty)
-                .ToListAsync();
-
-            if (roleNames.Count != 0)
+            if (roles.Count != 0)
             {
-                await _userManager.AddToRolesAsync(user, roleNames);
+                await _userManager.AddToRolesAsync(user, roles);
             }
 
             List<Claim> claims = [
@@ -52,7 +47,7 @@ namespace OrderMS.Infrastructure.Persistence
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
             ];
 
-            claims.AddRange(roleNames.Select(r => new Claim(ClaimTypes.Role, r ?? string.Empty)));
+            claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r ?? string.Empty)));
 
 
             var claimResult = await _userManager.AddClaimsAsync(user, claims);
@@ -97,28 +92,36 @@ namespace OrderMS.Infrastructure.Persistence
             return await _userManager.FindByEmailAsync(email);
         }
 
-        public async Task<bool> CreateRolesAsync(IList<string> roleNames)
+        public async Task<ApplicationUser?> GetByIdAsync(Guid id)
         {
-            if (roleNames == null || !roleNames.Any())
-                throw new ArgumentNullException(nameof(roleNames));
+            if (id == Guid.Empty)
+                throw new ArgumentNullException(nameof(id));
 
-            foreach (var roleName in roleNames)
+            return await _userManager.FindByIdAsync(id.ToString());
+        }
+
+        public async Task<bool> CreateRolesAsync(IList<string> roles)
+        {
+            if (!roles.Any())
+                throw new ArgumentNullException(nameof(roles));
+
+            foreach (var role in roles)
             {
-                if (string.IsNullOrWhiteSpace(roleName))
+                if (string.IsNullOrWhiteSpace(role))
                     continue;
 
-                var exists = await _roleManager.RoleExistsAsync(roleName);
+                var exists = await _roleManager.RoleExistsAsync(role);
                 if (exists)
                     continue;
 
-                var role = new IdentityRole<Guid>
+                var roleEntity = new IdentityRole<Guid>
                 {
                     Id = Guid.NewGuid(),
-                    Name = roleName,
-                    NormalizedName = roleName.ToUpperInvariant()
+                    Name = role,
+                    NormalizedName = role.ToUpperInvariant()
                 };
 
-                var result = await _roleManager.CreateAsync(role);
+                var result = await _roleManager.CreateAsync(roleEntity);
                 if (!result.Succeeded)
                 {
                     return false;
@@ -150,10 +153,9 @@ namespace OrderMS.Infrastructure.Persistence
             return await _userManager.IsInRoleAsync(user, role);
         }
 
-        public async Task<bool> AssignUserToRole(Guid userId, IList<Guid> roles)
+        public async Task<bool> AssignUserToRole(Guid userId, IList<string> roles)
         {
-            if (roles == null || !roles.Any())
-                throw new ArgumentNullException(nameof(roles), "No role id is provided.");
+            List<string> errors = [];
 
             if (userId == Guid.Empty)
                 throw new ArgumentNullException(nameof(userId), "User ID cannot be empty.");
@@ -161,19 +163,73 @@ namespace OrderMS.Infrastructure.Persistence
             var user = await _userManager.FindByIdAsync(userId.ToString()) ??
                 throw new ArgumentException("User not found.", nameof(userId));
 
-            foreach (var roleId in roles)
+            if (roles.Any())
             {
-                var role = await _roleManager.FindByIdAsync(roleId.ToString()) ??
-                    throw new ArgumentException($"Role with id '{roleId}' not found.", nameof(roles));
-
-                var result = await _userManager.AddToRoleAsync(user, role.Name ?? string.Empty);
-                if (!result.Succeeded)
+                foreach (var role in roles)
                 {
-                    return false;
+                    var isRoleExist = await _roleManager.RoleExistsAsync(role);
+
+                    if (!isRoleExist) errors.Add($"Role with name '{role}' not found.");
+
+                    var result = await _userManager.AddToRoleAsync(user, role ?? string.Empty);
+                    if (!result.Succeeded)
+                    {
+                        return false;
+                    }
                 }
+            }
+
+            var result2 = await _userManager.AddToRoleAsync(user, "Customer");
+            if (!result2.Succeeded)
+            {
+                return false;
             }
 
             return true;
         }
+
+        public async Task<bool> UpdateUserRolesAsync(ApplicationUser user, IList<string> roles)
+        {
+            if (user is null)
+                throw new ArgumentNullException(nameof(user), "Invalid user!");
+
+            var oldRoles = await _userManager.GetRolesAsync(user);
+            var identityResult = await _userManager.RemoveFromRolesAsync(user, oldRoles);
+            if (!identityResult.Succeeded)
+            {
+                return identityResult.Succeeded;
+            }
+
+            if (roles.Any())
+            {
+                var filteredRoles = await GetFilteredRoles(roles);
+                identityResult = await _userManager.AddToRolesAsync(user, filteredRoles);
+            }
+
+            return identityResult.Succeeded;
+        }
+
+        public async Task<bool> UpdateUserAsync(ApplicationUser user)
+        {
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded;
+        }
+
+        private async Task<IList<string>> GetFilteredRoles(IList<string> roles)
+        {
+            IList<string> existingRoles = [];
+
+            foreach (var role in roles)
+            {
+                if (await _roleManager.RoleExistsAsync(role))
+                {
+                    existingRoles.Add(role);
+                }
+            }
+
+            return existingRoles;
+        }
+
+
     }
 }

@@ -1,18 +1,20 @@
-
-
-using OrderMS.Application.Dtos.Responses;
+using OrderMS.Application.Dtos.Common.Responses;
+using OrderMS.Application.Dtos.Users.Responses;
 using OrderMS.Domain.Entities;
 
 namespace OrderMS.Application.Services;
 
 public interface IIdentityService
 {
-    Task<ApiResponse<int>> CreateUserAsync(ApplicationUser user, IList<Guid> roles, string password);
+    Task<ApiResponse<int>> CreateUserAsync(ApplicationUser user, IList<string> roles, string password);
     Task<bool> AuthenticateUserAsync(string email, string password);
     Task<ApplicationUser?> GetUserByEmailAsync(string email);
+    Task<ApplicationUser?> GetByIdAsync(Guid id);
     Task<bool> CreateRolesAsync(IList<string> roleNames);
+    Task<bool> UpdateUserRolesAsync(ApplicationUser user, IList<string> roles);
+    Task<bool> UpdateUserAsync(ApplicationUser user);
     Task<List<RoleDto>> GetRolesAsync();
     Task<bool> IsInRoleAsync(Guid userId, string role);
-    Task<bool> AssignUserToRole(Guid userId, IList<Guid> roles);
+    Task<bool> AssignUserToRole(Guid userId, IList<string> roles);
 
 }
