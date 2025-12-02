@@ -1,6 +1,24 @@
-@OrderMS.Api_HostAddress = http://localhost:5077
+@hostAddress = http://localhost:5077
 
-GET {{OrderMS.Api_HostAddress}}/weatherforecast/
+
+POST {{hostAddress}}/api/Auth/login
+Content-Type: application/json
 Accept: application/json
 
+{
+    "email": "admin@test.com",
+    "password": "Admin123!"
+}
 ###
+POST {{hostAddress}}/api/User/create
+Content-Type: application/json
+Accept: application/json
+{
+  "firstName": "Chala",
+  "lastName": "Girma",
+  "roles": [
+    "c6bcfdb3-56a3-4bda-b6d5-1016f51b19cd", "ff3ce170-e1dc-4982-ac38-b6186c897e8b"
+  ],
+  "email": "ttadesse625@gmail.com",
+  "password": "Chala@123"
+}
