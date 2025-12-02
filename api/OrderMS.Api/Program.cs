@@ -1,10 +1,7 @@
 using System.Diagnostics;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
 using OrderMS.Api.Middlewares;
 using OrderMS.Application;
 using OrderMS.Infrastructure;
@@ -50,10 +47,6 @@ builder.Services.AddApplicationServices()
 
 // builder.Services.AddOpenApi();
 
-// builder.Services.AddOpenApi(options =>
-// {
-//     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
-// });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -114,28 +107,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-
-internal sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvider authenticationSchemeProvider) : IOpenApiDocumentTransformer
-{
-    public async Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
-    {
-        var authenticationSchemes = await authenticationSchemeProvider.GetAllSchemesAsync();
-        if (authenticationSchemes.Any(authScheme => authScheme.Name == "Bearer"))
-        {
-            var requirements = new Dictionary<string, OpenApiSecurityScheme>
-            {
-                ["Bearer"] = new OpenApiSecurityScheme
-                {
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "bearer", // "bearer" refers to the header name here
-                    In = ParameterLocation.Header,
-                    BearerFormat = "Json Web Token"
-                }
-            };
-            document.Components ??= new OpenApiComponents();
-            document.Components.SecuritySchemes = requirements;
-        }
-    }
-}
 
