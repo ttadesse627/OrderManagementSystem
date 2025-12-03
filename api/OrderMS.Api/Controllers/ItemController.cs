@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderMS.Application.Dtos.Common.Responses;
 using OrderMS.Application.Dtos.Items.Requests;
-using OrderMS.Application.Features.Items.Commands;
+using OrderMS.Application.Features.Items.Commands.Create;
+using OrderMS.Application.Features.Items.Commands.Delete;
 using OrderMS.Application.Features.Items.Queries;
 
 namespace OrderMS.Api.Controllers;
@@ -32,5 +33,12 @@ public class ItemController(ILogger<ItemController> logger) : ApiControllerBase
         bool sortDescending = false)
     {
         return Ok(await _sender.Send(new GetItemsQuery(currentPage, pageSize, sortBy, sortDescending)));
+    }
+
+    [Authorize(Roles = "Admin, User")]
+    [HttpDelete("{id}", Name = "DeleteItems")]
+    public async Task<ActionResult<ApiResponse<string>>> Delete(Guid id)
+    {
+        return Ok(await _sender.Send(new DeleteItemCommand(id)));
     }
 }

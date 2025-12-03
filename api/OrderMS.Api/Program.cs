@@ -91,7 +91,7 @@ if (app.Environment.IsDevelopment())
 
 app.Use(async (context, next) =>
 {
-    Console.WriteLine(context.User);
+    Console.WriteLine(context.User.Identity?.IsAuthenticated);
     await next();
 });
 

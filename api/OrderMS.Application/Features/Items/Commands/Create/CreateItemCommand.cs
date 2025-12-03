@@ -5,7 +5,7 @@ using OrderMS.Application.Dtos.Items.Requests;
 using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
 
-namespace OrderMS.Application.Features.Items.Commands;
+namespace OrderMS.Application.Features.Items.Commands.Create;
 
 public record CreateItemCommand(ItemRequest ItemRequest) : IRequest<ApiResponse<Guid>>;
 public class CreateItemCommandHandler(IItemRepository itemRepository, IFileService fileService, IBackgroundTaskQueue queue) : IRequestHandler<CreateItemCommand, ApiResponse<Guid>>

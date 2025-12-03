@@ -1,7 +1,7 @@
 
 using FluentValidation;
 
-namespace OrderMS.Application.Features.Items.Commands;
+namespace OrderMS.Application.Features.Items.Commands.Create;
 
 public class CreateItemCommandValidator : AbstractValidator<CreateItemCommand>
 {
