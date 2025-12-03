@@ -4,8 +4,8 @@ using OrderMS.Application.Dtos.Items.Responses;
 
 namespace OrderMS.Application.Dtos.Items.Requests;
 
-public record OrderedItem
+public record OrderItemRequest
 {
-    public ItemDto? Item { get; set; }
+    public Guid ItemId { get; set; }
     public int Quantity { get; set; }
 }

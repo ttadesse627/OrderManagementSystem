@@ -1,39 +1,53 @@
+using FluentValidation;
 using MediatR;
 using OrderMS.Application.Dtos.Common.Responses;
-using OrderMS.Application.Dtos.Orders.Requests;
+using OrderMS.Application.Dtos.Items.Requests;
 using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
 using OrderMS.Domain.Enums;
 
 namespace OrderMS.Application.Features.Orders.Commands;
 
-public record CreateOrderCommand(OrderRequest OrderRequest) : IRequest<ApiResponse<Guid>>;
-public class CreateOrderCommandHandler(IOrderRepository orderRepository, IItemRepository itemRepository, IUserResolverService userResolverService) : IRequestHandler<CreateOrderCommand, ApiResponse<Guid>>
+public record CreateOrderCommand(List<OrderItemRequest> Items) : IRequest<ApiResponse<Guid>>;
+public class CreateOrderCommandHandler(
+                                        IOrderRepository orderRepository,
+                                        IItemRepository itemRepository, IUserResolverService userResolverService,
+                                        ICustomerRepository customerRepository
+                                    ) : IRequestHandler<CreateOrderCommand, ApiResponse<Guid>>
 {
     private readonly IOrderRepository _orderRepository = orderRepository;
     private readonly IItemRepository _itemRepository = itemRepository;
+    private readonly ICustomerRepository _customerRepository = customerRepository;
     private readonly IUserResolverService _userResolverService = userResolverService;
 
     public async Task<ApiResponse<Guid>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
         ApiResponse<Guid> response = new();
 
-        if (request.OrderRequest.Items.Count == 0)
+        if (request.Items.Count == 0)
         {
             throw new ApplicationException("No items are specified.");
         }
 
-        HashSet<Guid> itemIds = [.. request.OrderRequest.Items.Select(i => i.ItemId).Distinct()];
-        var dbItems = await _itemRepository.GetFilteredValuesAsync(i => request.OrderRequest.Items.Select(it => it.ItemId).Contains(i.Id));
+        HashSet<Guid> itemIds = [.. request.Items.Select(i => i.ItemId).Distinct()];
+        var dbItems = await _itemRepository.GetFilteredValuesAsync(i => request.Items.Select(it => it.ItemId).Contains(i.Id));
 
-        if (dbItems.Count != request.OrderRequest.Items.Count)
+        if (dbItems.Count != request.Items.Count)
         {
             throw new InvalidOperationException("One or more items in the order request are invalid.");
         }
 
+        var userId = _userResolverService.GetUserId();
+
+        if (userId == Guid.Empty)
+        {
+            throw new ValidationException("You are an Authorized person!");
+        }
+        var customer = await _customerRepository.GetFilteredValuesAsync(cust => cust.UserId == userId);
+
         var newOrder = new Order
         {
-            CustomerId = request.OrderRequest.CustomerId,
+            CustomerId = customer.First().Id,
             OrderDate = DateTime.UtcNow,
             Status = OrderStatus.Ordered,
             TotalAmount = 0
@@ -42,7 +56,7 @@ public class CreateOrderCommandHandler(IOrderRepository orderRepository, IItemRe
         var orderItems = new List<OrderItem>();
         decimal totalAmount = 0;
 
-        foreach (var requestedItemDto in request.OrderRequest.Items)
+        foreach (var requestedItemDto in request.Items)
         {
             var itemDetails = dbItems.First(i => i.Id == requestedItemDto.ItemId);
 

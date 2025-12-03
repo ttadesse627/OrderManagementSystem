@@ -1,5 +1,5 @@
 using MediatR;
-using OrderMS.Application.Dtos.Items.Responses;
+using OrderMS.Application.Dtos.Users.Responses;
 using OrderMS.Application.Services;
 using OrderMS.Domain.Utilities;
 
@@ -9,23 +9,23 @@ public record GetUsersQuery(
         int pageNumber,
         int pageSize,
         string? sortBy = null,
-        bool sortDescending = false) : IRequest<PaginatedResult<ItemDto>>;
-public class GetUsersQueryHandler(IItemRepository itemRepository) : IRequestHandler<GetUsersQuery, PaginatedResult<ItemDto>>
+        bool sortDescending = false) : IRequest<PaginatedResult<UserDto>>;
+public class GetUsersQueryHandler(IIdentityService identityService) : IRequestHandler<GetUsersQuery, PaginatedResult<UserDto>>
 {
-    private readonly IItemRepository _itemRepository = itemRepository;
+    private readonly IIdentityService _identityService = identityService;
 
-    public async Task<PaginatedResult<ItemDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedResult<UserDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
 
-        var paginatedUsers = await _itemRepository.GetPaginatedAsync(
+        var paginatedUsers = await _identityService.GetPaginatedAsync(
             request.pageNumber,
             request.pageSize,
             request.sortBy,
             request.sortDescending
         );
-        var usersDto = paginatedUsers.Items.MapTo<List<ItemDto>>();
+        var usersDto = paginatedUsers.Items.MapTo<List<UserDto>>();
 
-        return new PaginatedResult<ItemDto>
+        return new PaginatedResult<UserDto>
         {
             PageNumber = paginatedUsers.PageNumber,
             PageSize = paginatedUsers.PageSize,

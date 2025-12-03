@@ -8,10 +8,9 @@ using OrderMS.Domain.Entities;
 namespace OrderMS.Application.Features.Users.Commands.Update;
 
 public record UpdateUserCommand(Guid Id, UpdateRequest UpdateRequest) : IRequest<ApiResponse<string>>;
-public class UpdateUserCommandHandler(IIdentityService identityService, ITokenGeneratorService tokenGeneratorService) : IRequestHandler<UpdateUserCommand, ApiResponse<string>>
+public class UpdateUserCommandHandler(IIdentityService identityService) : IRequestHandler<UpdateUserCommand, ApiResponse<string>>
 {
     private readonly IIdentityService _identityService = identityService;
-    private readonly ITokenGeneratorService _tokenGeneratorService = tokenGeneratorService;
     public async Task<ApiResponse<string>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
         ApiResponse<string> apiResponse = new();

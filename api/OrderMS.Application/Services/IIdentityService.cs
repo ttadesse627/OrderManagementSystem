@@ -4,7 +4,7 @@ using OrderMS.Domain.Entities;
 
 namespace OrderMS.Application.Services;
 
-public interface IIdentityService
+public interface IIdentityService : ICommonRepository<ApplicationUser>
 {
     Task<ApiResponse<int>> CreateUserAsync(ApplicationUser user, IList<string> roles, string password);
     Task<bool> AuthenticateUserAsync(string email, string password);

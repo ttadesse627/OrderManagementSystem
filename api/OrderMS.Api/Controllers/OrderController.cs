@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderMS.Application.Dtos.Common.Responses;
-using OrderMS.Application.Dtos.Orders.Requests;
+using OrderMS.Application.Dtos.Items.Requests;
+using OrderMS.Application.Dtos.Orders.Responses;
 using OrderMS.Application.Features.Orders.Commands;
 using OrderMS.Application.Features.Orders.Queries;
 
@@ -13,9 +14,9 @@ public class OrderController(ILogger<OrderController> logger) : ApiControllerBas
 {
     private readonly ILogger<OrderController> _logger = logger;
 
-    [Authorize(Roles = "User, Admin")]
+    [Authorize(Roles = "Customer")]
     [HttpPost("create")]
-    public async Task<ActionResult<ApiResponse<Guid>>> Create(OrderRequest orderRequest)
+    public async Task<ActionResult<ApiResponse<Guid>>> Create(List<OrderItemRequest> orderRequest)
     {
         return Created(string.Empty, await _sender.Send(new CreateOrderCommand(orderRequest)));
     }

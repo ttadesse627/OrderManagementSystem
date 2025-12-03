@@ -30,6 +30,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.ApplyConfiguration(new CustomerEntityTypeConfig());
         modelBuilder.ApplyConfiguration(new ItemEntityTypeConfig());
         modelBuilder.ApplyConfiguration(new OrderEntityTypeConfig());
+        modelBuilder.ApplyConfiguration(new OrderItemEntityTypeConfig());
 
         SeedInitialData(modelBuilder);
 

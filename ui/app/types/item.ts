@@ -10,12 +10,6 @@ export interface Category {
   name: string;
 }
 
-export interface ApiResponse<T> {
-  data: T;
-  success: boolean;
-  message?: string;
-}
-
 export interface Item {
   id: string;
   name: string;

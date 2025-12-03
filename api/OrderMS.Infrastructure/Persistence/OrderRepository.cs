@@ -17,12 +17,20 @@ public class OrderRepository(ApplicationDbContext context) : CommonRepository<Or
 
     public async Task<IReadOnlyList<Order>> GetAllAsync()
     {
-        return await _context.Orders.AsNoTracking().Where(order => order.Status != OrderStatus.Delivered).ToListAsync();
+        return await _context.Orders.AsNoTracking()
+                                    .Where(order => order.Status != OrderStatus.Delivered)
+                                    .Include(order => order.Customer)
+                                        .ThenInclude(customer => customer.User)
+                                    .ToListAsync();
     }
 
     public async Task<Order?> GetByIdAsync(Guid id)
     {
-        return await _context.Orders.AsNoTracking().FirstOrDefaultAsync(i => i.Id == id);
+        return await _context.Orders.AsNoTracking()
+                    .Include(order => order.Items)
+                        .ThenInclude(it => it.Item)
+                    .Include(order => order.Customer)
+                    .FirstOrDefaultAsync(i => i.Id == id);
     }
 
     public void Update(Order order)

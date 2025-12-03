@@ -16,5 +16,10 @@ public class CustomerEntityTypeConfig : IEntityTypeConfiguration<Customer>
             .WithOne(user => user.Customer)
             .HasForeignKey<Customer>(customer => customer.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(customer => customer.Orders)
+            .WithOne(user => user.Customer)
+            .HasForeignKey(customer => customer.CustomerId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -10,16 +10,7 @@ public class OrderEntityTypeConfig : IEntityTypeConfiguration<Order>
     {
         builder.HasKey(order => order.Id);
 
-        builder.HasOne<Customer>()
-            .WithMany()
-            .HasForeignKey(order => order.CustomerId)
-            .OnDelete(DeleteBehavior.Cascade);
-
         builder.HasMany(order => order.Items)
-            .WithMany()
-            .UsingEntity<OrderItem>(orderItem =>
-            {
-                orderItem.HasKey(oi => new { oi.OrderId, oi.ItemId });
-            });
+            .WithOne();
     }
 }

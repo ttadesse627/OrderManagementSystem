@@ -87,12 +87,16 @@ public static class ServiceContainer
     {
         services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
         services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<IUserResolverService, UserResolverService>();
         services.AddTransient<ITokenGeneratorService, TokenGeneratorService>();
 
         services.AddTransient(typeof(ICommonRepository<>), typeof(CommonRepository<>));
         services.AddTransient<IItemRepository, ItemRepository>();
         services.AddTransient<IFileService, FileService>();
         services.AddTransient<ICategoryRepository, CategoryRepository>();
+
+        services.AddTransient<IOrderRepository, OrderRepository>();
+        services.AddTransient<ICustomerRepository, CustomerRepository>();
 
         return services;
     }

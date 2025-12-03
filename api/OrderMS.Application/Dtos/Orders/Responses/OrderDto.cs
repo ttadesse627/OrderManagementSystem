@@ -1,14 +1,13 @@
 
-
-using OrderMS.Application.Dtos.Items.Requests;
 using OrderMS.Domain.Enums;
+
+namespace OrderMS.Application.Dtos.Orders.Responses;
 
 public class OrderDto
 {
     public Guid Id { get; set; }
-    public Guid CustomerId { get; set; }
+    public string? CustomerName { get; set; }
     public DateTime OrderDate { get; set; }
-    public decimal TotalAmount { get; set; }
     public OrderStatus Status { get; set; }
-    public ICollection<OrderedItem> Items { get; set; } = [];
+    public int TotalItems { get; set; }
 }

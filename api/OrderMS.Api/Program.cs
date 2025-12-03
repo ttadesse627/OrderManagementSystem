@@ -50,9 +50,8 @@ builder.Services.AddApplicationServices()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Order MS API", Version = "v1" });
 
-    // Define the Bearer token security scheme
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
@@ -62,7 +61,6 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer"
     });
 
-    // Require the Bearer token for all operations
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -74,7 +72,7 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
 });
@@ -83,7 +81,6 @@ builder.Services.AddSwaggerGen(c =>
 
 WebApplication app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     // app.MapOpenApi();
@@ -91,6 +88,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.Use(async (context, next) =>
+{
+    Console.WriteLine(context.User);
+    await next();
+});
 
 app.UseExceptionHandler();
 

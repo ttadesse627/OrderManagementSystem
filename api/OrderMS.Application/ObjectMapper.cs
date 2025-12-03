@@ -1,6 +1,8 @@
 using Mapster;
 using OrderMS.Application.Dtos.Items.Responses;
+using OrderMS.Application.Dtos.Users.Responses;
 using OrderMS.Domain.Entities;
+using OrderMS.Domain.Utilities;
 
 namespace OrderMS.Application;
 
@@ -13,6 +15,8 @@ public static class ObjectMapper
         _config = TypeAdapterConfig.GlobalSettings;
 
         _config.NewConfig<Item, ItemDto>();
+        _config.NewConfig<ApplicationUser, UserDto>();
+        _config.NewConfig<PaginatedResult<ApplicationUser>, PaginatedResult<UserDto>>();
     }
 
     public static TDestination MapTo<TDestination>(this object source)

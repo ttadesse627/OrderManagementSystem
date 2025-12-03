@@ -12,4 +12,6 @@ public interface ICommonRepository<T> where T : class
         string? sortBy = null,
         bool sortDescending = false,
         Expression<Func<T, bool>>? filter = null);
+
+    Task<IList<T>> GetFilteredValuesAsync(Expression<Func<T, bool>>? filter = null);
 }

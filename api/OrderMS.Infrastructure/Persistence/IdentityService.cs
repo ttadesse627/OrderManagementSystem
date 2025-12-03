@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using OrderMS.Application.Dtos.Common.Responses;
 using OrderMS.Application.Dtos.Users.Responses;
@@ -9,7 +10,9 @@ using OrderMS.Domain.Entities;
 
 namespace OrderMS.Infrastructure.Persistence
 {
-    public class IdentityService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<Guid>> roleManager) : IIdentityService
+    public class IdentityService(ApplicationDbContext context,
+                UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+                : CommonRepository<ApplicationUser>(context), IIdentityService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager = roleManager;
@@ -97,7 +100,9 @@ namespace OrderMS.Infrastructure.Persistence
             if (id == Guid.Empty)
                 throw new ArgumentNullException(nameof(id));
 
-            return await _userManager.FindByIdAsync(id.ToString());
+            return await _userManager.Users
+                        .Where(user => user.Id == id)
+                        .FirstOrDefaultAsync();
         }
 
         public async Task<bool> CreateRolesAsync(IList<string> roles)

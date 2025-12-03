@@ -73,4 +73,13 @@ public class CommonRepository<T>(ApplicationDbContext context) : ICommonReposito
 
         return (IQueryable<T>)result!;
     }
+
+    public async Task<IList<T>> GetFilteredValuesAsync(Expression<Func<T, bool>>? filter = null)
+    {
+        if (filter is null)
+        {
+            return await _context.Set<T>().ToListAsync();
+        }
+        return await _context.Set<T>().Where(filter).ToListAsync();
+    }
 }
