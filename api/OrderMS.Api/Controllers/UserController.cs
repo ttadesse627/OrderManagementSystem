@@ -49,6 +49,6 @@ public class UserController : ApiControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<AuthResponse>> GetProfile(Guid id)
     {
-        return Created("", await _sender.Send(new GetUserByIdQuery(id)));
+        return Ok(await _sender.Send(new GetUserByIdQuery(id)));
     }
 }
