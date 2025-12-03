@@ -58,4 +58,6 @@ dotnet ef database update --startup-project api\OrderMs.Api --project api\OrderM
 
 ```
 
-Before running these commands, you need to configure your connection string.
+Before running these commands, you need to configure your connection string to database.
+
+### The UI is not working for now. Use Swagger UI or Scalar
