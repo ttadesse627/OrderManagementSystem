@@ -7,15 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="13.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.11" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.11">
+    <PackageReference Include="MediatR"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Scalar.AspNetCore" Version="2.11.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
+    <PackageReference Include="Scalar.AspNetCore" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup>
