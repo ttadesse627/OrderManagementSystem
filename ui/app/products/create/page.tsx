@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // for App Router
-import { ItemRequest, Category } from '../../types/item';
+import { ItemRequest, Category } from '../../../types/product';
 import { env } from 'process';
 
 export default function CreateItemPage() {
@@ -142,7 +142,7 @@ export default function CreateItemPage() {
       
       // Redirect to items list after 2 seconds
       setTimeout(() => {
-        router.push('/items');
+        router.push('/products');
       }, 2000);
 
     } catch (err: any) {

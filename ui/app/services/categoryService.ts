@@ -1,5 +1,5 @@
-import { CategoryRequest, CategoryDto} from '../types/category';
-import { ApiResponse } from '../types/apiResponse';
+import { CategoryRequest, CategoryDto} from '../../types/category';
+import { ApiResponse } from '../../types/apiResponse';
 import { apiConfig } from '../../config/api';
 import { getAuthToken } from '../utils/auth';
 

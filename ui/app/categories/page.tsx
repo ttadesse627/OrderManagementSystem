@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { CategoryDto } from '../types/category';
+import { CategoryDto } from '../../types/category';
 import { categoryService } from '../services/categoryService';
 
 export default function CategoriesPage() {

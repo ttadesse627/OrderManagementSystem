@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { Item } from '../types/item';
+import { Item } from '../../types/product';
 
 export default function ItemsPage() {
   const router = useRouter();
@@ -50,7 +50,7 @@ export default function ItemsPage() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Items</h1>
           <button
-            onClick={() => router.push('/items/create')}
+            onClick={() => router.push('/products/create')}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
             Create New Item

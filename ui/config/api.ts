@@ -4,7 +4,7 @@ class ApiConfig {
 
   constructor() {
     // Use environment variable with fallback for development
-    this.baseUrl = 'http://localhost:5077';
+    this.baseUrl = process.env.NEXT_PUBLIC_API_URL + "/api/";
   }
 
   // Get the base URL
@@ -105,10 +105,10 @@ class ApiConfig {
 
     // Item routes
     items: {
-      list: '/items',
-      create: '/items/create',
-      edit: (id: string) => `/items/edit/${id}`,
-      view: (id: string) => `/items/${id}`,
+      list: '/products',
+      create: '/products/create',
+      edit: (id: string) => `/products/edit/${id}`,
+      view: (id: string) => `/products/${id}`,
     },
 
     // Admin routes
