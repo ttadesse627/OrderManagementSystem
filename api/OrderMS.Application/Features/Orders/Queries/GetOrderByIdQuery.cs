@@ -1,8 +1,8 @@
 using FluentValidation;
 using MediatR;
 using OrderMS.Application.Dtos.Customers.Responses;
-using OrderMS.Application.Dtos.Items.Requests;
-using OrderMS.Application.Dtos.Items.Responses;
+using OrderMS.Application.Dtos.Products.Requests;
+using OrderMS.Application.Dtos.Products.Responses;
 using OrderMS.Application.Dtos.Orders.Responses;
 using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
@@ -19,7 +19,7 @@ public class GetOrderByIdQueryHandler(IOrderRepository orderRepository, ICustome
     {
         var order = (query.Id != Guid.Empty ? await _orderRepository.GetByIdAsync(query.Id)
                     : throw new ValidationException($"{nameof(query.Id)} is not provided.")) ??
-                throw new KeyNotFoundException("Requested item does not found");
+                throw new KeyNotFoundException("Requested Product does not found");
 
         var customer = await _customerRepository.GetByIdAsync(order.CustomerId);
 
@@ -35,14 +35,14 @@ public class GetOrderByIdQueryHandler(IOrderRepository orderRepository, ICustome
             },
             OrderDate = order.OrderDate,
             Status = order.Status,
-            Items = [.. order.Items.Select(i =>
-                        new OrderedItem
+            Products = [.. order.Products.Select(i =>
+                        new OrderedProduct
                         {
-                            Item = new ItemDto
+                            Product = new ProductDto
                             {
-                                Id = i.ItemId,
-                                Name = i.Item.Name,
-                                Price = i.Item.Price
+                                Id = i.ProductId,
+                                Name = i.Product.Name,
+                                Price = i.Product.Price
                             }
                         }
                     )]

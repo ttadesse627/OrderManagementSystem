@@ -19,7 +19,7 @@ public class GetOrdersQueryHandler(IOrderRepository orderRepository) : IRequestH
                 CustomerName = string.Join("", [order.Customer.User.FirstName, order.Customer.User.LastName]),
                 OrderDate = order.OrderDate,
                 Status = order.Status,
-                TotalItems = order.Items.Count
+                TotalProducts = order.Products.Count
             };
         });
 

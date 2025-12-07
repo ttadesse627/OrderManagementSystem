@@ -1,22 +1,22 @@
 using FluentValidation;
 using MediatR;
 using OrderMS.Application.Dtos.Common.Responses;
-using OrderMS.Application.Dtos.Items.Requests;
+using OrderMS.Application.Dtos.Products.Requests;
 using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
 using OrderMS.Domain.Enums;
 
 namespace OrderMS.Application.Features.Orders.Commands;
 
-public record CreateOrderCommand(List<OrderItemRequest> Items) : IRequest<ApiResponse<Guid>>;
+public record CreateOrderCommand(List<OrderProductRequest> Products) : IRequest<ApiResponse<Guid>>;
 public class CreateOrderCommandHandler(
                                         IOrderRepository orderRepository,
-                                        IItemRepository itemRepository, IUserResolverService userResolverService,
+                                        IProductRepository ProductRepository, IUserResolverService userResolverService,
                                         ICustomerRepository customerRepository
                                     ) : IRequestHandler<CreateOrderCommand, ApiResponse<Guid>>
 {
     private readonly IOrderRepository _orderRepository = orderRepository;
-    private readonly IItemRepository _itemRepository = itemRepository;
+    private readonly IProductRepository _ProductRepository = ProductRepository;
     private readonly ICustomerRepository _customerRepository = customerRepository;
     private readonly IUserResolverService _userResolverService = userResolverService;
 
@@ -24,17 +24,17 @@ public class CreateOrderCommandHandler(
     {
         ApiResponse<Guid> response = new();
 
-        if (request.Items.Count == 0)
+        if (request.Products.Count == 0)
         {
-            throw new ApplicationException("No items are specified.");
+            throw new ApplicationException("No Products are specified.");
         }
 
-        HashSet<Guid> itemIds = [.. request.Items.Select(i => i.ItemId).Distinct()];
-        var dbItems = await _itemRepository.GetFilteredValuesAsync(i => request.Items.Select(it => it.ItemId).Contains(i.Id));
+        HashSet<Guid> ProductIds = [.. request.Products.Select(i => i.ProductId).Distinct()];
+        var dbProducts = await _ProductRepository.GetFilteredValuesAsync(i => request.Products.Select(it => it.ProductId).Contains(i.Id));
 
-        if (dbItems.Count != request.Items.Count)
+        if (dbProducts.Count != request.Products.Count)
         {
-            throw new InvalidOperationException("One or more items in the order request are invalid.");
+            throw new InvalidOperationException("One or more Products in the order request are invalid.");
         }
 
         var userId = _userResolverService.GetUserId();
@@ -53,34 +53,34 @@ public class CreateOrderCommandHandler(
             TotalAmount = 0
         };
 
-        var orderItems = new List<OrderItem>();
+        var orderProducts = new List<OrderProduct>();
         decimal totalAmount = 0;
 
-        foreach (var requestedItemDto in request.Items)
+        foreach (var requestedProductDto in request.Products)
         {
-            var itemDetails = dbItems.First(i => i.Id == requestedItemDto.ItemId);
+            var ProductDetails = dbProducts.First(i => i.Id == requestedProductDto.ProductId);
 
-            if (itemDetails.StockQuantity < requestedItemDto.Quantity)
+            if (ProductDetails.StockQuantity < requestedProductDto.Quantity)
             {
-                throw new InvalidOperationException($"Insufficient stock for Item {itemDetails.Name}");
+                throw new InvalidOperationException($"Insufficient stock for Product {ProductDetails.Name}");
             }
 
-            decimal itemCost = itemDetails.Price * requestedItemDto.Quantity;
-            totalAmount += itemCost;
+            decimal ProductCost = ProductDetails.Price * requestedProductDto.Quantity;
+            totalAmount += ProductCost;
 
-            orderItems.Add(new OrderItem
+            orderProducts.Add(new OrderProduct
             {
                 OrderId = newOrder.Id,
-                ItemId = requestedItemDto.ItemId,
-                ItemQuantity = requestedItemDto.Quantity
+                ProductId = requestedProductDto.ProductId,
+                ProductQuantity = requestedProductDto.Quantity
             });
 
             // Deduct stock quantity
-            itemDetails.StockQuantity -= requestedItemDto.Quantity;
+            ProductDetails.StockQuantity -= requestedProductDto.Quantity;
         }
 
         newOrder.TotalAmount = totalAmount;
-        newOrder.Items = orderItems;
+        newOrder.Products = orderProducts;
 
         _orderRepository.Add(newOrder);
         var result = await _orderRepository.SaveChangesAsync(cancellationToken);

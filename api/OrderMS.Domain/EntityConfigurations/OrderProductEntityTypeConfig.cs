@@ -4,20 +4,20 @@ using OrderMS.Domain.Entities;
 
 namespace OrderMS.Domain.EntityConfigurations;
 
-public class OrderItemEntityTypeConfig : IEntityTypeConfiguration<OrderItem>
+public class OrderProductEntityTypeConfig : IEntityTypeConfiguration<OrderProduct>
 {
-    public void Configure(EntityTypeBuilder<OrderItem> builder)
+    public void Configure(EntityTypeBuilder<OrderProduct> builder)
     {
-        builder.HasKey(oi => new { oi.OrderId, oi.ItemId });
+        builder.HasKey(oi => new { oi.OrderId, oi.ProductId });
 
         builder.HasOne(oi => oi.Order)
-            .WithMany(o => o.Items)
+            .WithMany(o => o.Products)
             .HasForeignKey(oi => oi.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(oi => oi.Item)
+        builder.HasOne(oi => oi.Product)
             .WithMany()
-            .HasForeignKey(oi => oi.ItemId);
+            .HasForeignKey(oi => oi.ProductId);
 
     }
 }

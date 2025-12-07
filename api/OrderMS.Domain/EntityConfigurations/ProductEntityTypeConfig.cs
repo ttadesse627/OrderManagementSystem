@@ -5,19 +5,19 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OrderMS.Domain.Entities;
 namespace OrderMS.Domain.EntityConfigurations;
 
-public class ItemEntityTypeConfig : IEntityTypeConfiguration<Item>
+public class ProductEntityTypeConfig : IEntityTypeConfiguration<Product>
 {
-    public void Configure(EntityTypeBuilder<Item> builder)
+    public void Configure(EntityTypeBuilder<Product> builder)
     {
-        builder.HasKey(item => item.Id);
+        builder.HasKey(product => product.Id);
 
-        builder.Property(item => item.Name)
+        builder.Property(product => product.Name)
             .IsRequired()
             .HasMaxLength(200);
 
         builder.HasOne<Category>()
             .WithMany()
-            .HasForeignKey(item => item.CategoryId)
+            .HasForeignKey(product => product.CategoryId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

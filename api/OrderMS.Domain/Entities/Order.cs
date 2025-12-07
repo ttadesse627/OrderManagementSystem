@@ -11,6 +11,6 @@ namespace OrderMS.Domain.Entities
         public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; }
         public OrderStatus Status { get; set; } = OrderStatus.Ordered;
-        public ICollection<OrderItem> Items { get; set; } = [];
+        public ICollection<OrderProduct> Products { get; set; } = [];
     }
 }

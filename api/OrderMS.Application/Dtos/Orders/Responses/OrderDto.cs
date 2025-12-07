@@ -9,5 +9,5 @@ public class OrderDto
     public string? CustomerName { get; set; }
     public DateTime OrderDate { get; set; }
     public OrderStatus Status { get; set; }
-    public int TotalItems { get; set; }
+    public int TotalProducts { get; set; }
 }

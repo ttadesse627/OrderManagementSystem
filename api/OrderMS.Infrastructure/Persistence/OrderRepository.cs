@@ -27,8 +27,8 @@ public class OrderRepository(ApplicationDbContext context) : CommonRepository<Or
     public async Task<Order?> GetByIdAsync(Guid id)
     {
         return await _context.Orders.AsNoTracking()
-                    .Include(order => order.Items)
-                        .ThenInclude(it => it.Item)
+                    .Include(order => order.Products)
+                        .ThenInclude(it => it.Product)
                     .Include(order => order.Customer)
                     .FirstOrDefaultAsync(i => i.Id == id);
     }
