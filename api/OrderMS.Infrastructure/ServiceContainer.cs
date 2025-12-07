@@ -27,16 +27,18 @@ public static class ServiceContainer
 
     public static IServiceCollection ConfigureDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
+        var connectionString = configuration.GetConnectionString("PostgresqlConnection")
             ?? throw new InvalidOperationException("Connection string 'OrderMSConnectionString' not found.");
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseMySql(
-                connectionString,
-                ServerVersion.AutoDetect(connectionString),
-                mySqlOptions => mySqlOptions.EnableRetryOnFailure()
-            ).EnableSensitiveDataLogging();
+            // options.UseMySql(
+            //     connectionString,
+            //     ServerVersion.AutoDetect(connectionString),
+            //     mySqlOptions => mySqlOptions.EnableRetryOnFailure()
+            // ).EnableSensitiveDataLogging();
+
+            options.UseNpgsql(connectionString);
         }, ServiceLifetime.Scoped);
 
         return services;
@@ -91,7 +93,7 @@ public static class ServiceContainer
         services.AddTransient<ITokenGeneratorService, TokenGeneratorService>();
 
         services.AddTransient(typeof(ICommonRepository<>), typeof(CommonRepository<>));
-        services.AddTransient<IItemRepository, ItemRepository>();
+        services.AddTransient<IProductRepository, ProductRepository>();
         services.AddTransient<IFileService, FileService>();
         services.AddTransient<ICategoryRepository, CategoryRepository>();
 
