@@ -9,7 +9,7 @@ public class FileService(ILogger<FileService> logger) : IFileService
 {
     private readonly ILogger<FileService> _logger = logger;
 
-    public async Task UploadAsync(IFormFile file, Guid id)
+    public async Task<string> UploadAsync(IFormFile file, Guid id)
     {
         string extension = Path.GetExtension(file.FileName);
 
@@ -26,10 +26,8 @@ public class FileService(ILogger<FileService> logger) : IFileService
         {
             _logger.LogError(exception, "Error occurred while trying to save file.");
         }
-    }
-    public Task<IFormFile> RetrieveAsync(Guid id)
-    {
-        throw new NotImplementedException();
+
+        return fileName;
     }
 
     public (bool Success, string? ErrorMessage) IsValid(IFormFile file)

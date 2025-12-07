@@ -5,8 +5,7 @@ namespace OrderMS.Application.Services;
 
 public interface IFileService
 {
-    Task UploadAsync(IFormFile file, Guid id);
-    Task<IFormFile> RetrieveAsync(Guid id);
+    Task<string> UploadAsync(IFormFile file, Guid id);
 
     (bool Success, string? ErrorMessage) IsValid(IFormFile file);
 
