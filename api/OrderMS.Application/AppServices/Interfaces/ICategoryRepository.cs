@@ -2,7 +2,7 @@ using OrderMS.Domain.Entities;
 using System.Linq.Expressions;
 using OrderMS.Domain.Utilities;
 
-namespace OrderMS.Application.Services;
+namespace OrderMS.Application.AppServices.Interfaces;
 
 public interface ICategoryRepository
 {

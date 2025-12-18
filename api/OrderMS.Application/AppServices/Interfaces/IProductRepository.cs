@@ -1,12 +1,12 @@
 using OrderMS.Domain.Entities;
 
-namespace OrderMS.Application.Services;
+namespace OrderMS.Application.AppServices.Interfaces;
 
 public interface IProductRepository : ICommonRepository<Product>
 {
-    void Add(Product Product);
+    void Add(Product product);
     Task<IReadOnlyList<Product>> GetAllAsync();
     Task<Product?> GetByIdAsync(Guid id);
-    void Update(Product Product);
-    void Delete(Product Product);
+    Task<Product?> GetForUpdateAsync(Guid id);
+    void Delete(Product product);
 }

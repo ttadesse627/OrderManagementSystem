@@ -1,22 +1,29 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
-using OrderMS.Application.Services;
+using OrderMS.Application.AppServices.Interfaces;
 
 namespace OrderMS.Infrastructure.Services;
 
-public class UserResolverService : IUserResolverService
+public class UserResolverService(IHttpContextAccessor httpContext) : IUserResolverService
 {
-    private readonly IHttpContextAccessor _httpContext;
-
-    public UserResolverService(IHttpContextAccessor httpContext)
-    {
-        this._httpContext = httpContext;
-    }
+    private readonly IHttpContextAccessor _httpContext = httpContext;
 
     public string? GetUserEmail()
     {
-        return _httpContext.HttpContext?.User?.Claims?.SingleOrDefault(p => p.Type == JwtRegisteredClaimNames.Email)?.Value;
+        return _httpContext.HttpContext?.User?.Claims?
+                .SingleOrDefault(p => p.Type == JwtRegisteredClaimNames.Email)?.Value;
+    }
+
+    public string? GetTokenExpirationTime()
+    {
+        return _httpContext.HttpContext?.User?.Claims?
+                .SingleOrDefault(p => p.Type == JwtRegisteredClaimNames.Exp)?.Value;
+    }
+
+    public string? GetTokenId()
+    {
+        return _httpContext.HttpContext?.User?.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
     }
 
     public Guid GetUserId()

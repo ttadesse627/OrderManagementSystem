@@ -2,7 +2,7 @@ using OrderMS.Application.Dtos.Common.Responses;
 using OrderMS.Application.Dtos.Users.Responses;
 using OrderMS.Domain.Entities;
 
-namespace OrderMS.Application.Services;
+namespace OrderMS.Application.AppServices.Interfaces;
 
 public interface IIdentityService : ICommonRepository<ApplicationUser>
 {
@@ -16,5 +16,6 @@ public interface IIdentityService : ICommonRepository<ApplicationUser>
     Task<List<RoleDto>> GetRolesAsync();
     Task<bool> IsInRoleAsync(Guid userId, string role);
     Task<bool> AssignUserToRole(Guid userId, IList<string> roles);
+    Task SeedIdentitiesAsync(IServiceProvider services);
 
 }

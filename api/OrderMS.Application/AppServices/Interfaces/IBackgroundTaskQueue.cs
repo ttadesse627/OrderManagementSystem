@@ -1,6 +1,6 @@
 
 
-namespace OrderMS.Application.Services;
+namespace OrderMS.Application.AppServices.Interfaces;
 
 public interface IBackgroundTaskQueue
 {

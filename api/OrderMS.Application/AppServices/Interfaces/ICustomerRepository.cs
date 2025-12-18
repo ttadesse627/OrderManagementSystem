@@ -1,6 +1,6 @@
 using OrderMS.Domain.Entities;
 
-namespace OrderMS.Application.Services;
+namespace OrderMS.Application.AppServices.Interfaces;
 
 public interface ICustomerRepository : ICommonRepository<Customer>
 {
