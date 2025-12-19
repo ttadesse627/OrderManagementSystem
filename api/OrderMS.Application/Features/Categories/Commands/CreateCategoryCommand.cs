@@ -1,7 +1,7 @@
 using MediatR;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Application.Dtos.Categories.Requests;
 using OrderMS.Application.Dtos.Common.Responses;
-using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
 
 namespace OrderMS.Application.Features.Categories.Commands;

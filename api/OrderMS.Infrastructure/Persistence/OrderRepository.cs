@@ -1,6 +1,5 @@
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using OrderMS.Application.Services;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Domain.Entities;
 using OrderMS.Domain.Enums;
 
@@ -27,7 +26,7 @@ public class OrderRepository(ApplicationDbContext context) : CommonRepository<Or
     public async Task<Order?> GetByIdAsync(Guid id)
     {
         return await _context.Orders.AsNoTracking()
-                    .Include(order => order.Products)
+                    .Include(order => order.Items)
                         .ThenInclude(it => it.Product)
                     .Include(order => order.Customer)
                     .FirstOrDefaultAsync(i => i.Id == id);

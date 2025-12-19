@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using OrderMS.Application.Services;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Domain.Utilities;
 
 namespace OrderMS.Infrastructure.Persistence;
@@ -75,6 +75,15 @@ public class CommonRepository<T>(ApplicationDbContext context) : ICommonReposito
     }
 
     public async Task<IList<T>> GetFilteredValuesAsync(Expression<Func<T, bool>>? filter = null)
+    {
+        if (filter is null)
+        {
+            return await _context.Set<T>().AsNoTracking().ToListAsync();
+        }
+        return await _context.Set<T>().Where(filter).ToListAsync();
+    }
+
+    public async Task<IList<T>> GetFilteredForUpdateAsync(Expression<Func<T, bool>>? filter = null)
     {
         if (filter is null)
         {

@@ -1,6 +1,6 @@
 using MediatR;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Application.Dtos.Categories.Responses;
-using OrderMS.Application.Services;
 
 namespace OrderMS.Application.Features.Categories.Queries;
 

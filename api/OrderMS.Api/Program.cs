@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.OpenApi.Models;
 using OrderMS.Api.Middlewares;
 using OrderMS.Application;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Infrastructure;
-using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,8 +44,6 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddApplicationServices()
                 .AddInfrastructureServices(builder.Configuration);
-
-// builder.Services.AddOpenApi();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -95,18 +93,20 @@ app.Use(async (context, next) =>
     await next();
 });
 
+using (var scope = app.Services.CreateScope())
+{
+    var identityservice = scope.ServiceProvider.GetRequiredService<IIdentityService>();
+    await identityservice.SeedIdentitiesAsync(scope.ServiceProvider);
+    await identityservice.SeedIdentitiesAsync(scope.ServiceProvider);
+}
+
+app.UseStaticFiles();
 app.UseExceptionHandler();
-
 app.UseHttpsRedirection();
-
 app.UseStatusCodePages();
-
 app.UseCors(allowSpecificOrigins);
-
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

@@ -14,4 +14,5 @@ public interface ICommonRepository<T> where T : class
         Expression<Func<T, bool>>? filter = null);
 
     Task<IList<T>> GetFilteredValuesAsync(Expression<Func<T, bool>>? filter = null);
+    Task<IList<T>> GetFilteredForUpdateAsync(Expression<Func<T, bool>>? filter = null);
 }

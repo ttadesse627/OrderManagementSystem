@@ -1,5 +1,7 @@
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Application.Dtos.Common.Responses;
 using OrderMS.Application.Dtos.Products.Requests;
 using OrderMS.Application.Services;
@@ -8,11 +10,15 @@ using OrderMS.Domain.Entities;
 namespace OrderMS.Application.Features.Products.Commands.Create;
 
 public record CreateProductCommand(ProductRequest ProductRequest) : IRequest<ApiResponse<Guid>>;
-public class CreateProductCommandHandler(IProductRepository productRepository, IFileService fileService, IBackgroundTaskQueue queue) : IRequestHandler<CreateProductCommand, ApiResponse<Guid>>
+public class CreateProductCommandHandler(
+                    IProductRepository productRepository,
+                    IFileService fileService,
+                    IFileRepository fileRepository) : IRequestHandler<CreateProductCommand, ApiResponse<Guid>>
 {
     private readonly IProductRepository _productRepository = productRepository;
-    private readonly IBackgroundTaskQueue _queue = queue;
     private readonly IFileService _fileService = fileService;
+    private readonly IFileRepository _fileRepository = fileRepository;
+
     public async Task<ApiResponse<Guid>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
         var productValidator = new CreateProductCommandValidator();
@@ -24,50 +30,41 @@ public class CreateProductCommandHandler(IProductRepository productRepository, I
             throw new ApplicationException(string.Join(";", validationResult.Errors.Select(er => er.ErrorMessage)));
         }
 
-        var (succes, errorMessage) = request.ProductRequest.ProductImage == null ? (false, string.Empty) :
-            _fileService.IsValid(request.ProductRequest.ProductImage);
+        List<IFormFile> validImages = request.ProductRequest.ProductImages
+                                        .Where(img => _fileService.IsValid(img).Success)
+                                        .ToList();
 
         var product = new Product
         {
+            Id = Guid.NewGuid(),
             Name = request.ProductRequest.Name,
             Price = request.ProductRequest.Price,
             StockQuantity = request.ProductRequest.StockQuantity,
             CategoryId = request.ProductRequest.CategoryId
         };
+
         _productRepository.Add(product);
-        var createResult = await _productRepository.SaveChangesAsync(cancellationToken);
-        if (createResult > 0)
+
+
+        IList<string> fileNames = await _fileService.UploadFilesAsync(validImages, product.Id);
+        IList<FileName> files = [];
+
+        foreach (var fileName in fileNames)
         {
-            if (succes)
+            FileName file = new()
             {
-                string fileName = await _fileService.UploadAsync(request.ProductRequest.ProductImage!, product.Id);
-
-                if (fileName is not null)
-                {
-                    product.ImageUrl = fileName;
-                    await _productRepository.SaveChangesAsync(cancellationToken);
-                }
-                // _ = Task.Run(async () =>
-                // {
-                //     await _fileService.UploadAsync(request.ProductRequest.ProductImage!, Product.Id);
-                // }, cancellationToken);
-            }
-
-            else
-            {
-                throw new ValidationException(string.Join(";", validationResult.Errors.Select(er => er.ErrorMessage)));
-            }
-
-            // Save file in background
-            // _queue.QueueBackgroundTaskProduct(async cancellationToken =>
-            // {
-            //     await _fileService.UploadAsync(request.ProductRequest.ProductImage!, Product.Id);
-            // });
-
-            response.Data = product.Id;
-            response.Success = true;
-            response.Message = "Product created successfully.";
+                Name = fileName,
+                EntityType = nameof(Product)
+            };
+            files.Add(file);
         }
+
+        await _fileRepository.AddAsync(files);
+
+        var createResult = await _productRepository.SaveChangesAsync(cancellationToken);
+        response.Data = product.Id;
+        response.Success = true;
+        response.Message = "Product created successfully.";
 
         return await Task.FromResult(response);
     }

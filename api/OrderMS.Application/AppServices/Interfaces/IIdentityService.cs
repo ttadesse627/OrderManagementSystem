@@ -14,6 +14,7 @@ public interface IIdentityService : ICommonRepository<ApplicationUser>
     Task<bool> UpdateUserRolesAsync(ApplicationUser user, IList<string> roles);
     Task<bool> UpdateUserAsync(ApplicationUser user);
     Task<List<RoleDto>> GetRolesAsync();
+    Task<IReadOnlyList<string>> GetUserRolesAsync(ApplicationUser user);
     Task<bool> IsInRoleAsync(Guid userId, string role);
     Task<bool> AssignUserToRole(Guid userId, IList<string> roles);
     Task SeedIdentitiesAsync(IServiceProvider services);

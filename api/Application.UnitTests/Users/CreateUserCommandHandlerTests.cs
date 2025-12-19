@@ -1,10 +1,10 @@
 ﻿using Moq;
 using OrderMS.Application.Features.Users.Commands.Create;
 using OrderMS.Application.Dtos.Common.Responses;
-using OrderMS.Application.Services;
 using OrderMS.Application.Dtos.Users.Requests;
 using OrderMS.Domain.Entities;
 using OrderMS.Application.Dtos.Users.Responses;
+using OrderMS.Application.AppServices.Interfaces;
 
 namespace Application.UnitTests.Users
 {
@@ -13,6 +13,7 @@ namespace Application.UnitTests.Users
         private readonly Mock<IIdentityService> _identityServiceMock;
         private readonly Mock<ITokenGeneratorService> _tokenServiceMock;
         private readonly Mock<ICustomerRepository> _customerRepositoryMock;
+        private readonly Mock<IUserResolverService> _userResolverServiceMock;
 
         private readonly CreateUserCommandHandler _handler;
 
@@ -25,7 +26,8 @@ namespace Application.UnitTests.Users
             _handler = new CreateUserCommandHandler(
                 _identityServiceMock.Object,
                 _tokenServiceMock.Object,
-                _customerRepositoryMock.Object
+                _customerRepositoryMock.Object,
+                _userResolverServiceMock.Object
             );
         }
 
@@ -35,7 +37,7 @@ namespace Application.UnitTests.Users
                 FirstName: "Abebe",
                 LastName: "Chala",
                 Address: "Somewhere",
-                Roles: roles ?? ["User"],
+                Roles: roles ?? ["Customer"],
                 Email: "abebe@example.com",
                 Password: "P@ssw0rd!"
             );
@@ -56,9 +58,9 @@ namespace Application.UnitTests.Users
 
             var response = await _handler.Handle(request, CancellationToken.None);
 
-            Assert.Equal(request.RegisterRequest.Email, response.Email);
-            Assert.Equal(request.RegisterRequest.FirstName, response.FirstName);
-            Assert.Equal("GeneratedToken", response.Token);
+            Assert.Equal(request.RegisterRequest.Email, response.Data?.Email);
+            Assert.Equal(request.RegisterRequest.FirstName, response.Data?.FirstName);
+            Assert.Equal("GeneratedToken", response.Data?.Token);
 
             _identityServiceMock.Verify(x =>
                 x.CreateUserAsync(It.IsAny<ApplicationUser>(), It.IsAny<IList<string>>(), "P@ssw0rd!"),
@@ -105,7 +107,7 @@ namespace Application.UnitTests.Users
 
             var result = await _handler.Handle(request, CancellationToken.None);
 
-            Assert.True(string.IsNullOrEmpty(result.Token));
+            Assert.True(string.IsNullOrEmpty(result.Data?.Token));
 
             _tokenServiceMock.Verify(x => x.GenerateTokenAsync(It.IsAny<ApplicationUser>()), Times.Never);
         }
@@ -119,7 +121,7 @@ namespace Application.UnitTests.Users
                 .Setup(x => x.CreateUserAsync(It.IsAny<ApplicationUser>(), It.IsAny<IList<string>>(), It.IsAny<string>()))
                 .ReturnsAsync(new ApiResponse<int> { Success = true });
 
-            async Task<AuthResponse> action() => await _handler.Handle(request, CancellationToken.None);
+            async Task<ApiResponse<AuthResponse>> action() => await _handler.Handle(request, CancellationToken.None);
 
             await action();
         }

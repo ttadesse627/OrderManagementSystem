@@ -4,14 +4,14 @@ using OrderMS.Domain.Entities;
 
 namespace OrderMS.Domain.EntityConfigurations;
 
-public class OrderProductEntityTypeConfig : IEntityTypeConfiguration<OrderProduct>
+public class OrderProductEntityTypeConfig : IEntityTypeConfiguration<OrderItem>
 {
-    public void Configure(EntityTypeBuilder<OrderProduct> builder)
+    public void Configure(EntityTypeBuilder<OrderItem> builder)
     {
         builder.HasKey(oi => new { oi.OrderId, oi.ProductId });
 
         builder.HasOne(oi => oi.Order)
-            .WithMany(o => o.Products)
+            .WithMany(o => o.Items)
             .HasForeignKey(oi => oi.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
 

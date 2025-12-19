@@ -15,6 +15,7 @@
     </PackageReference>
     <!-- <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" /> -->
      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+     <PackageReference Include="StackExchange.Redis" />
   </ItemGroup>
 
   <PropertyGroup>

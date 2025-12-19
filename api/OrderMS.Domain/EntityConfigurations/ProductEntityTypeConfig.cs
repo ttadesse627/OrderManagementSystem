@@ -15,9 +15,14 @@ public class ProductEntityTypeConfig : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasMaxLength(200);
 
+        builder.Property(pr => pr.RowVersion)
+            .IsRowVersion()
+            .IsConcurrencyToken()
+            .ValueGeneratedOnAddOrUpdate();
+
         builder.HasOne<Category>()
-            .WithMany()
-            .HasForeignKey(product => product.CategoryId)
-            .OnDelete(DeleteBehavior.Cascade);
+           .WithMany()
+           .HasForeignKey(product => product.CategoryId)
+           .OnDelete(DeleteBehavior.Cascade);
     }
 }

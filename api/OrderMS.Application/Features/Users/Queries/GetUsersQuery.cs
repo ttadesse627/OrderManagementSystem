@@ -1,6 +1,6 @@
 using MediatR;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Application.Dtos.Users.Responses;
-using OrderMS.Application.Services;
 using OrderMS.Domain.Utilities;
 
 namespace OrderMS.Application.Features.Users.Queries;
@@ -23,14 +23,15 @@ public class GetUsersQueryHandler(IIdentityService identityService) : IRequestHa
             request.sortBy,
             request.sortDescending
         );
-        var usersDto = paginatedUsers.Items.MapTo<List<UserDto>>();
+        var usersDtos = paginatedUsers.Items.MapTo<List<UserDto>>();
+
 
         return new PaginatedResult<UserDto>
         {
             PageNumber = paginatedUsers.PageNumber,
             PageSize = paginatedUsers.PageSize,
             TotalCount = paginatedUsers.TotalCount,
-            Items = usersDto
+            Items = usersDtos
         };
     }
 }

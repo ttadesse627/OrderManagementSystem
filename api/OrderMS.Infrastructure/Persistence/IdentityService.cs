@@ -2,10 +2,12 @@ using System.Security.Claims;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Application.Dtos.Common.Responses;
 using OrderMS.Application.Dtos.Users.Responses;
-using OrderMS.Application.Services;
+using OrderMS.Domain.ConstantValues;
 using OrderMS.Domain.Entities;
 
 namespace OrderMS.Infrastructure.Persistence
@@ -144,6 +146,11 @@ namespace OrderMS.Infrastructure.Persistence
             return Task.FromResult(roles);
         }
 
+        public async Task<IReadOnlyList<string>> GetUserRolesAsync(ApplicationUser user)
+        {
+            return [.. await _userManager.GetRolesAsync(user)];
+        }
+
         public async Task<bool> IsInRoleAsync(Guid userId, string role)
         {
             if (userId == Guid.Empty)
@@ -234,7 +241,60 @@ namespace OrderMS.Infrastructure.Persistence
 
             return existingRoles;
         }
+        public async Task SeedIdentitiesAsync(IServiceProvider services)
+        {
+            using var scope = services.CreateScope();
 
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+
+            // Roles seeding
+            foreach (var role in IdentityConstantValues.SystemRoles.ALL)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    await roleManager.CreateAsync(new IdentityRole<Guid>(role));
+                }
+            }
+
+            var adminUser = await userManager.FindByEmailAsync(IdentityConstantValues.ADMIN_EMAIL);
+
+            if (adminUser is null)
+            {
+                adminUser = new ApplicationUser
+                {
+                    Id = Guid.NewGuid(),
+                    UserName = IdentityConstantValues.ADMIN_EMAIL,
+                    Email = IdentityConstantValues.ADMIN_EMAIL,
+                    EmailConfirmed = true
+                };
+
+                var result = await userManager.CreateAsync(adminUser, IdentityConstantValues.ADMIN_PASSWORD);
+
+                if (!result.Succeeded)
+                {
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    throw new InvalidOperationException($"Admin user creation failed: {errors}");
+                }
+            }
+
+            if (!await userManager.IsInRoleAsync(adminUser, IdentityConstantValues.SystemRoles.ADMIN))
+            {
+                await userManager.AddToRoleAsync(adminUser, IdentityConstantValues.SystemRoles.ADMIN);
+            }
+
+            var claims = await userManager.GetClaimsAsync(adminUser);
+
+            if (!claims.Any(c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == adminUser.Id.ToString()))
+            {
+                await userManager.AddClaimsAsync(adminUser,
+                    [
+                        new(JwtRegisteredClaimNames.Sub, adminUser.Id.ToString()),
+                        new(JwtRegisteredClaimNames.Email, IdentityConstantValues.ADMIN_EMAIL),
+                        new(ClaimTypes.Role, IdentityConstantValues.SystemRoles.ADMIN),
+                    ]);
+            }
+        }
 
     }
 }

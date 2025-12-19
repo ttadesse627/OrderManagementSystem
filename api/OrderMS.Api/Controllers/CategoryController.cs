@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderMS.Application.Dtos.Categories.Requests;
 using OrderMS.Application.Dtos.Categories.Responses;
@@ -11,6 +12,7 @@ namespace OrderMS.Api.Controllers;
 [Route("api/[controller]")]
 public class CategoryController : ApiControllerBase
 {
+    [Authorize(Roles = "Admin, Seller")]
     [HttpPost("create")]
     public async Task<ActionResult<ApiResponse<Guid>>> Create(CategoryRequest request)
     {

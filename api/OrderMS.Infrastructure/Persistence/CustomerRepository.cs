@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using OrderMS.Application.Services;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Domain.Entities;
 
 namespace OrderMS.Infrastructure.Persistence;

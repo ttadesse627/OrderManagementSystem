@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
 using OrderMS.Domain.Utilities;

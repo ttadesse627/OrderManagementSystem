@@ -4,8 +4,7 @@ using OrderMS.Application.Dtos.Customers.Responses;
 using OrderMS.Application.Dtos.Products.Requests;
 using OrderMS.Application.Dtos.Products.Responses;
 using OrderMS.Application.Dtos.Orders.Responses;
-using OrderMS.Application.Services;
-using OrderMS.Domain.Entities;
+using OrderMS.Application.AppServices.Interfaces;
 
 namespace OrderMS.Application.Features.Orders.Queries;
 
@@ -35,7 +34,7 @@ public class GetOrderByIdQueryHandler(IOrderRepository orderRepository, ICustome
             },
             OrderDate = order.OrderDate,
             Status = order.Status,
-            Products = [.. order.Products.Select(i =>
+            Products = [.. order.Items.Select(i =>
                         new OrderedProduct
                         {
                             Product = new ProductDto

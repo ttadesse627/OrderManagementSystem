@@ -1,10 +1,11 @@
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using OrderMS.Application.Services;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Domain.Entities;
 using OrderMS.Domain.Utilities;
 
@@ -20,14 +21,10 @@ public class TokenGeneratorService(IOptions<JwtSettings> options, UserManager<Ap
         var secretKey = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey ??
                         throw new InvalidOperationException("JWT Key not configured."));
 
-        var userRoles = await _userManager.GetRolesAsync(user);
+        IList<Claim> claims = await _userManager.GetClaimsAsync(user);
 
-        List<Claim> claims = [
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
-        ];
+        claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
 
-        claims.AddRange(userRoles.Select(ur => new Claim(ClaimTypes.Role, ur)));
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
@@ -40,5 +37,16 @@ public class TokenGeneratorService(IOptions<JwtSettings> options, UserManager<Ap
         var token = tokenHandler.CreateToken(tokenDescriptor);
 
         return await Task.FromResult(token);
+    }
+
+    public async Task<string> GenerateTokenAsync(Guid userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        return await GenerateTokenAsync(user ?? throw new KeyNotFoundException("User doesn't exist"));
+    }
+
+    public string GenerateRefreshToken()
+    {
+        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
     }
 }

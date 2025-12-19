@@ -10,7 +10,7 @@ public class OrderEntityTypeConfig : IEntityTypeConfiguration<Order>
     {
         builder.HasKey(order => order.Id);
 
-        builder.HasMany(order => order.Products)
+        builder.HasMany(order => order.Items)
             .WithOne();
     }
 }

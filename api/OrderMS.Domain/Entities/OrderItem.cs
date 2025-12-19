@@ -2,7 +2,7 @@
 
 namespace OrderMS.Domain.Entities;
 
-public class OrderProduct
+public class OrderItem
 {
     public Guid OrderId { get; set; }
     public Product Product { get; set; } = null!;

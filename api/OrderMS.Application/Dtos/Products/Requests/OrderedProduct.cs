@@ -8,4 +8,5 @@ public record OrderedProduct
 {
     public ProductDto? Product { get; set; }
     public int Quantity { get; set; }
+    public decimal TaxRate { get; set; }
 }

@@ -1,8 +1,10 @@
+
 namespace OrderMS.Application.Dtos.Users.Requests;
 
-public record UpdateRequest(
-    string FirstName,
-    string LastName,
-    string Address,
-    IList<string> Roles
-);
+public record UpdateRequest
+{
+    public string? FirstName { get; init; } = null;
+    public string? LastName { get; init; } = null;
+    public string? Address { get; init; } = null;
+    public IList<string> Roles { get; init; } = [];
+};

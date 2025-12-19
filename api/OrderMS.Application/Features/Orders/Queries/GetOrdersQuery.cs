@@ -1,6 +1,6 @@
 using MediatR;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Application.Dtos.Orders.Responses;
-using OrderMS.Application.Services;
 
 namespace OrderMS.Application.Features.Orders.Queries;
 
@@ -19,7 +19,7 @@ public class GetOrdersQueryHandler(IOrderRepository orderRepository) : IRequestH
                 CustomerName = string.Join("", [order.Customer.User.FirstName, order.Customer.User.LastName]),
                 OrderDate = order.OrderDate,
                 Status = order.Status,
-                TotalProducts = order.Products.Count
+                TotalProducts = order.Items.Count
             };
         });
 

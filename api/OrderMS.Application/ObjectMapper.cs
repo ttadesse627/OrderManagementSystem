@@ -1,4 +1,5 @@
 using Mapster;
+using OrderMS.Application.Dtos.Products.Requests;
 using OrderMS.Application.Dtos.Products.Responses;
 using OrderMS.Application.Dtos.Users.Responses;
 using OrderMS.Domain.Entities;
@@ -14,6 +15,7 @@ public static class ObjectMapper
     {
         _config = TypeAdapterConfig.GlobalSettings;
 
+        _config.NewConfig<ProductRequest, Product>();
         _config.NewConfig<Product, ProductDto>();
         _config.NewConfig<ApplicationUser, UserDto>();
         _config.NewConfig<PaginatedResult<ApplicationUser>, PaginatedResult<UserDto>>();

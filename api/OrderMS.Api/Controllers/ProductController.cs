@@ -14,15 +14,18 @@ public class ProductController(ILogger<ProductController> logger) : ApiControlle
 {
     private readonly ILogger<ProductController> _logger = logger;
 
-    [Authorize(Roles = "User, Admin")]
+    [Authorize(Roles = "Admin, Seller")]
     [HttpPost("create")]
     public async Task<ActionResult<ApiResponse<Guid>>> Create([FromForm] ProductRequest productRequest)
     {
-        if (productRequest.ProductImage == null)
-        {
-            _logger.LogError("File is missing");
-        }
         return Created(string.Empty, await _sender.Send(new CreateProductCommand(productRequest)));
+    }
+
+    [Authorize(Roles = "Admin, Seller")]
+    [HttpPut("{id}/update")]
+    public async Task<ActionResult<ApiResponse<Guid>>> Update(Guid id, [FromForm] ProductRequest productRequest)
+    {
+        return Ok(await _sender.Send(new UpdateProductCommand(id, productRequest)));
     }
 
     [HttpGet(Name = "GetProducts")]
@@ -35,8 +38,14 @@ public class ProductController(ILogger<ProductController> logger) : ApiControlle
         return Ok(await _sender.Send(new GetProductsQuery(currentPage, pageSize, sortBy, sortDescending)));
     }
 
-    [Authorize(Roles = "Admin, User")]
-    [HttpDelete("{id}", Name = "DeleteProducts")]
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ApiResponse<string>>> GetById(Guid id)
+    {
+        return Ok(await _sender.Send(new DeleteProductCommand(id)));
+    }
+
+    [Authorize(Roles = "Admin, Seller")]
+    [HttpDelete("{id}/delete", Name = "DeleteProducts")]
     public async Task<ActionResult<ApiResponse<string>>> Delete(Guid id)
     {
         return Ok(await _sender.Send(new DeleteProductCommand(id)));

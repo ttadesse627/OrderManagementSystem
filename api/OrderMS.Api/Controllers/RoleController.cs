@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Application.Dtos.Common.Responses;
 using OrderMS.Application.Dtos.Users.Responses;
-using OrderMS.Application.Services;
 
 namespace OrderMS.Api.Controllers;
 
@@ -35,6 +35,7 @@ public class RoleController(IIdentityService identityService) : ApiControllerBas
 
         return Ok(apiResponse);
     }
+    [Authorize(Roles = "Admin")]
     [HttpGet(Name = "Roles")]
     public async Task<ActionResult<List<RoleDto>>> Get()
     {

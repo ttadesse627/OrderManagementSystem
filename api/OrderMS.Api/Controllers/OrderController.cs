@@ -16,12 +16,12 @@ public class OrderController(ILogger<OrderController> logger) : ApiControllerBas
 
     [Authorize(Roles = "Customer")]
     [HttpPost("create")]
-    public async Task<ActionResult<ApiResponse<Guid>>> Create(List<OrderProductRequest> orderRequest)
+    public async Task<ActionResult<ApiResponse<Guid>>> Create(List<OrderItemRequest> orderRequest)
     {
         return Created(string.Empty, await _sender.Send(new CreateOrderCommand(orderRequest)));
     }
 
-    [Authorize(Roles = "Admin, User")]
+    [Authorize(Roles = "Admin, Seller")]
     [HttpGet(Name = "GetOrders")]
     public async Task<ActionResult<IList<OrderDto>>> Get()
     {

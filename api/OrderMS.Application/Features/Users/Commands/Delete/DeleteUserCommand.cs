@@ -1,7 +1,7 @@
 using FluentValidation;
 using MediatR;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Application.Dtos.Common.Responses;
-using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
 using OrderMS.Domain.Enums;
 

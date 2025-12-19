@@ -11,4 +11,5 @@ public interface ITokenRepository
 
     Task RevokeTokensAsync(string jti, TimeSpan expirationTime);
     Task<bool> IsTokenRevokedAsync(string jti);
+    Task<RefreshToken?> GetRefreshTokenAsync(string refreshToken);
 }
