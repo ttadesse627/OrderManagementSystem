@@ -7,15 +7,15 @@ using OrderMS.Domain.EntityConfigurations;
 namespace OrderMS.Infrastructure;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-: IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid, IdentityUserClaim<Guid>,
-                    IdentityUserRole<Guid>, IdentityUserLogin<Guid>,
-                    IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>(options)
+                                : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid, IdentityUserClaim<Guid>,
+                                                    IdentityUserRole<Guid>, IdentityUserLogin<Guid>,
+                                                    IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>(options)
 {
     public DbSet<Category> Categories { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Order> Orders { get; set; }
-    public DbSet<FileName> FileNames { get; set; }
+    public DbSet<FileResource> FileResources { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -32,6 +32,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.ApplyConfiguration(new OrderEntityTypeConfig());
         modelBuilder.ApplyConfiguration(new OrderProductEntityTypeConfig());
         modelBuilder.ApplyConfiguration(new RefreshTokenEntityTypeConfig());
-
+        modelBuilder.ApplyConfiguration(new FileResourceEntityTypeConfig());
     }
 }

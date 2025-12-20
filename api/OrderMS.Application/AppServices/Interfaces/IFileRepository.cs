@@ -4,10 +4,12 @@ namespace OrderMS.Application.AppServices.Interfaces;
 
 public interface IFileRepository
 {
-    Task AddAsync(FileName fileName);
-    Task AddAsync(IList<FileName> fileNames);
-    Task<IReadOnlyList<FileName>> GetAllAsync();
-    Task<FileName?> GetByIdAsync(Guid id);
-    void Update(FileName fileName);
+    Task AddAsync(FileResource fileName);
+    Task AddAsync(IList<FileResource> fileNames);
+    Task<IReadOnlyList<FileResource>> GetAllAsync();
+    Task<FileResource?> GetByIdAsync(Guid id);
+    Task<IReadOnlyList<string>> GetProductImageUrlsAsync(Guid productId);
+    Task<string?> GetProductImageUrlAsync(Guid productId);
+    void Update(FileResource fileName);
     Task<bool> Delete(string fileName, CancellationToken cancellationToken);
 }

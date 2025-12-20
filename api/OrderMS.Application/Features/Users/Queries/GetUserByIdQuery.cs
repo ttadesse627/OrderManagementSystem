@@ -14,7 +14,6 @@ public class GetUserByIdQueryHandler(IIdentityService identityService) : IReques
 
         var user = await _identityService.GetByIdAsync(request.Id) ??
                     throw new KeyNotFoundException("This user does not exist.");
-        Console.Write($"There user's Id is: {user.Id}");
 
         IReadOnlyList<string> userRoles = user is not null ? await _identityService.GetUserRolesAsync(user) : [];
 

@@ -38,21 +38,12 @@ public class UpdateProductCommandHandler
                                        .ToList();
 
 
-        IList<string> fileNames = await _fileService.UploadFilesAsync(validImages, existingProduct.Id);
+        IList<FileResource> fileResources = await _fileService.UploadFilesAsync(validImages, existingProduct.Id, nameof(Product));
 
-        IList<FileName> files = [];
-
-        foreach (var fileName in fileNames)
+        if (fileResources.Any())
         {
-            FileName file = new()
-            {
-                Name = fileName,
-                EntityType = nameof(Product)
-            };
-
-            files.Add(file);
+            await _fileRepository.AddAsync(fileResources);
         }
-        await _fileRepository.AddAsync(files);
 
         await _productRepository.SaveChangesAsync(cancellationToken);
 

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Application.Dtos.Common.Responses;
 using OrderMS.Application.Dtos.Products.Requests;
-using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
 
 namespace OrderMS.Application.Features.Products.Commands.Create;
@@ -30,9 +29,7 @@ public class CreateProductCommandHandler(
             throw new ApplicationException(string.Join(";", validationResult.Errors.Select(er => er.ErrorMessage)));
         }
 
-        List<IFormFile> validImages = request.ProductRequest.ProductImages
-                                        .Where(img => _fileService.IsValid(img).Success)
-                                        .ToList();
+        List<IFormFile> validImages = [.. request.ProductRequest.ProductImages.Where(img => _fileService.IsValid(img).Success)];
 
         var product = new Product
         {
@@ -46,20 +43,11 @@ public class CreateProductCommandHandler(
         _productRepository.Add(product);
 
 
-        IList<string> fileNames = await _fileService.UploadFilesAsync(validImages, product.Id);
-        IList<FileName> files = [];
-
-        foreach (var fileName in fileNames)
+        IList<FileResource> fileResources = await _fileService.UploadFilesAsync(validImages, product.Id, nameof(Product));
+        if (fileResources.Any())
         {
-            FileName file = new()
-            {
-                Name = fileName,
-                EntityType = nameof(Product)
-            };
-            files.Add(file);
+            await _fileRepository.AddAsync(fileResources);
         }
-
-        await _fileRepository.AddAsync(files);
 
         var createResult = await _productRepository.SaveChangesAsync(cancellationToken);
         response.Data = product.Id;

@@ -20,8 +20,8 @@ public class ProductEntityTypeConfig : IEntityTypeConfiguration<Product>
             .IsConcurrencyToken()
             .ValueGeneratedOnAddOrUpdate();
 
-        builder.HasOne<Category>()
-           .WithMany()
+        builder.HasOne(product => product.Category)
+           .WithMany(category => category.Products)
            .HasForeignKey(product => product.CategoryId)
            .OnDelete(DeleteBehavior.Cascade);
     }

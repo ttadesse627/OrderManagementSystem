@@ -57,12 +57,8 @@ public static class ServiceContainer
             options.ConnectRetry = 5;
             options.ConnectTimeout = 5000;
 
-            Console.WriteLine($"Parsed Redis Connection : {options}");
-
             return ConnectionMultiplexer.Connect(options);
         });
-
-        Console.WriteLine($"Redis Connection from Environment Variable: {remoteRedisConnection}");
 
         return services;
     }

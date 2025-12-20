@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OrderMS.Application.AppServices.Interfaces;
+using OrderMS.Domain.Entities;
+using OrderMS.Domain.Utilities;
+using OrderMS.Domain.Utilities.Enums;
 
 namespace OrderMS.Infrastructure.Persistence;
 
@@ -11,7 +14,7 @@ public class FileService(ILogger<FileService> logger, IWebHostEnvironment hostEn
     private readonly ILogger<FileService> _logger = logger;
     private readonly IWebHostEnvironment _env = hostEnvironment;
 
-    public (bool Success, string? ErrorMessage) IsValid(IFormFile file)
+    public ValidationResult IsValid(IFormFile file)
     {
         // Get File Extension
         List<string> validExtensions = [".jpg", ".png", ".gif"];
@@ -20,80 +23,95 @@ public class FileService(ILogger<FileService> logger, IWebHostEnvironment hostEn
         {
             string message = $"The extension {extension} is not supported."
                                     + $"Valid extensions are {string.Join(",", validExtensions)}.";
-            return (false, message);
+            return new ValidationResult(false, message, Severity.Error);
         }
 
         long maxFileSize = 5 * 1024 * 1024; //Limited to 5MB
 
         // Validate File size
         long fileSize = file.Length;
-        if (fileSize > (maxFileSize))
+        if (fileSize > maxFileSize)
         {
             string message = $"The size of your file exceeds maximum supported file size {maxFileSize}.";
-            return (false, message);
+            return new ValidationResult(false, message, Severity.Error);
         }
 
-        return (true, null);
+        return new ValidationResult(true, null, Severity.Info);
     }
 
-    public async Task<string> UploadAsync(IFormFile file, Guid id)
+    public async Task<FileResource?> UploadAsync(IFormFile file, Guid id, string entityType)
     {
+        string webRoot = _env.WebRootPath;
+
+        string objectFolder = Path.Combine(webRoot, "uploads");
         string extension = Path.GetExtension(file.FileName);
 
         //File saving
         string fileName = id.ToString() + extension;
-        string pathToSave = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+        FileResource? fileResource = null;
 
         try
         {
-            await using FileStream fileStream = new(Path.Combine(pathToSave, fileName), FileMode.Create);
+            await using FileStream fileStream = new(Path.Combine(objectFolder, fileName), FileMode.Create);
             await file.CopyToAsync(fileStream);
+
+            fileResource = new FileResource
+            {
+                Name = $"/uploads/{id}/{fileName}",
+                EntityType = entityType,
+                ContentType = file.ContentType,
+                Size = file.Length
+            };
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, "Error occurred while trying to save file.");
         }
 
-        return fileName;
+        return fileResource;
     }
 
-    public async Task<IList<string>> UploadFilesAsync(IList<IFormFile> files, Guid id)
+    public async Task<IList<FileResource>> UploadFilesAsync(IList<IFormFile> files, Guid id, string entityType)
     {
         // Determine the webroot directory (wwwroot)
         string webRoot = _env.WebRootPath;
 
-        string userFolder = Path.Combine(webRoot, "uploads", id.ToString());
+        string objectFolder = Path.Combine(webRoot, "uploads", id.ToString());
 
-        if (!Directory.Exists(userFolder))
+        if (!Directory.Exists(objectFolder))
         {
-            Directory.CreateDirectory(userFolder);
+            Directory.CreateDirectory(objectFolder);
         }
 
-        var fileUrls = new List<string>();
-        int counter = 0;
+        List<FileResource> fileResources = [];
 
         foreach (var file in files)
         {
             string extension = Path.GetExtension(file.FileName);
-            string fileName = $"{id}_{counter}{extension}";
-            string fullPath = Path.Combine(userFolder, fileName);
+            string fileName = file.FileName;
+            string fullPath = Path.Combine(objectFolder, fileName);
 
             try
             {
                 await using var stream = new FileStream(fullPath, FileMode.Create);
                 await file.CopyToAsync(stream);
 
+                FileResource fileResource = new()
+                {
+                    Name = $"/uploads/{id}/{fileName}",
+                    EntityType = entityType,
+                    ContentType = file.ContentType,
+                    Size = file.Length
+                };
                 // Build a URL that the client can use to access this file
-                string publicUrl = $"/uploads/{id}/{fileName}";
-                fileUrls.Add(publicUrl);
-                counter++;
+                fileResources.Add(fileResource);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving file {FileName} for user {UserId}", fileName, id);
+                _logger.LogError($"Error saving file {fileName} for user {id}", ex);
             }
         }
 
-        return fileUrls;
+        return fileResources;
     }
 }

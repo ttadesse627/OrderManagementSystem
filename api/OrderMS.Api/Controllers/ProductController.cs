@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderMS.Application.Dtos.Common.Responses;
 using OrderMS.Application.Dtos.Products.Requests;
+using OrderMS.Application.Dtos.Products.Responses;
 using OrderMS.Application.Features.Products.Commands.Create;
 using OrderMS.Application.Features.Products.Commands.Delete;
 using OrderMS.Application.Features.Products.Queries;
@@ -39,9 +40,9 @@ public class ProductController(ILogger<ProductController> logger) : ApiControlle
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ApiResponse<string>>> GetById(Guid id)
+    public async Task<ActionResult<ProductDetailDto>> GetById(Guid id)
     {
-        return Ok(await _sender.Send(new DeleteProductCommand(id)));
+        return Ok(await _sender.Send(new GetProductByIdQuery(id)));
     }
 
     [Authorize(Roles = "Admin, Seller")]
