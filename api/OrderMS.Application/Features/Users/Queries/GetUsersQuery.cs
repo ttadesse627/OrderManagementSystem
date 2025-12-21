@@ -6,7 +6,7 @@ using OrderMS.Domain.Utilities;
 namespace OrderMS.Application.Features.Users.Queries;
 
 public record GetUsersQuery(
-        int pageNumber,
+        int currentPage,
         int pageSize,
         string? sortBy = null,
         bool sortDescending = false) : IRequest<PaginatedResult<UserDto>>;
@@ -18,7 +18,7 @@ public class GetUsersQueryHandler(IIdentityService identityService) : IRequestHa
     {
 
         var paginatedUsers = await _identityService.GetPaginatedAsync(
-            request.pageNumber,
+            request.currentPage,
             request.pageSize,
             request.sortBy,
             request.sortDescending
@@ -28,7 +28,7 @@ public class GetUsersQueryHandler(IIdentityService identityService) : IRequestHa
 
         return new PaginatedResult<UserDto>
         {
-            PageNumber = paginatedUsers.PageNumber,
+            CurrentPage = paginatedUsers.CurrentPage,
             PageSize = paginatedUsers.PageSize,
             TotalCount = paginatedUsers.TotalCount,
             Items = usersDtos

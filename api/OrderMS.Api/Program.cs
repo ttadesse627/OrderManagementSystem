@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.OpenApi.Models;
@@ -28,7 +29,6 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.PropertyNamingPolicy = null;
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
@@ -79,17 +79,17 @@ builder.Services.AddSwaggerGen(c =>
 
 WebApplication app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    // app.MapOpenApi();
-    // app.MapScalarApiReference();
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// if (app.Environment.IsDevelopment())
+// {
+//     // app.MapOpenApi();
+//     // app.MapScalarApiReference();
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.Use(async (context, next) =>
 {
-    Console.WriteLine(context.User.Identity?.IsAuthenticated);
+    Console.WriteLine($"User is authenticated: {context.User.Identity?.IsAuthenticated}");
     await next();
 });
 

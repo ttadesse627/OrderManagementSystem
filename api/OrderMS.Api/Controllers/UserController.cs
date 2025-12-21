@@ -40,12 +40,12 @@ public class UserController(ApplicationDbContext context) : ApiControllerBase
     [Authorize(Roles = "Admin")]
     [HttpGet(Name = "Users")]
     public async Task<ActionResult<UserDto>> Get(
-        int pageNumber = 1,
+        int currentPage = 1,
         int pageSize = 15,
         string? sortBy = null,
         bool sortDescending = false)
     {
-        return Ok(await _sender.Send(new GetUsersQuery(pageNumber, pageSize, sortBy, sortDescending)));
+        return Ok(await _sender.Send(new GetUsersQuery(currentPage, pageSize, sortBy, sortDescending)));
     }
 
     [Authorize(Roles = "Admin")]

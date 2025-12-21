@@ -8,5 +8,5 @@ public record ProductRequest
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
     public Guid CategoryId { get; set; }
-    public required IList<IFormFile> ProductImages { get; set; } = [];
+    public required IList<IFormFile> Images { get; set; } = [];
 };

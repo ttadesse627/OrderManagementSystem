@@ -22,6 +22,7 @@ namespace Application.UnitTests.Users
             _identityServiceMock = new Mock<IIdentityService>();
             _tokenServiceMock = new Mock<ITokenGeneratorService>();
             _customerRepositoryMock = new Mock<ICustomerRepository>();
+            _userResolverServiceMock = new Mock<IUserResolverService>();
 
             _handler = new CreateUserCommandHandler(
                 _identityServiceMock.Object,

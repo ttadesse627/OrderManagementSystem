@@ -27,21 +27,21 @@ public class GetProductsQueryHandler(IProductRepository productRepository, IFile
         );
 
         var dtoProducts = paginatedProducts.Items.Select(product => new ProductDto
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Price = product.Price,
-                Category = product.Category?.Name,
-            }).ToList();
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Price = product.Price,
+            Category = product.Category?.Name,
+        }).ToList();
 
-            foreach (var product in dtoProducts)
-            {
-                product.ImageUrl = await _fileRepository.GetProductImageUrlAsync(product.Id);
-            }
+        foreach (var product in dtoProducts)
+        {
+            product.ImageUrl = await _fileRepository.GetProductImageUrlAsync(product.Id);
+        }
 
         return new PaginatedResult<ProductDto>
         {
-            PageNumber = paginatedProducts.PageNumber,
+            CurrentPage = paginatedProducts.CurrentPage,
             PageSize = paginatedProducts.PageSize,
             TotalCount = paginatedProducts.TotalCount,
             Items = dtoProducts

@@ -33,7 +33,7 @@ public class UpdateProductCommandHandler
         existingProduct.Name = request.ProductRequest.Name;
 
 
-        List<IFormFile> validImages = request.ProductRequest.ProductImages
+        List<IFormFile> validImages = request.ProductRequest.Images
                                        .Where(img => _fileService.IsValid(img).Success)
                                        .ToList();
 

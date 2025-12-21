@@ -74,7 +74,7 @@ public class CategoryRepository(ApplicationDbContext context) : ICategoryReposit
         return new PaginatedResult<Category>
         {
             Items = categories,
-            PageNumber = pageNumber,
+            CurrentPage = pageNumber,
             PageSize = pageSize,
             TotalCount = totalCount
         };

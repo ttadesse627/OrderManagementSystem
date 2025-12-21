@@ -47,7 +47,7 @@ public class CommonRepository<T>(ApplicationDbContext context) : ICommonReposito
         return new PaginatedResult<T>
         {
             Items = items,
-            PageNumber = pageNumber,
+            CurrentPage = pageNumber,
             PageSize = pageSize,
             TotalCount = totalCount
         };

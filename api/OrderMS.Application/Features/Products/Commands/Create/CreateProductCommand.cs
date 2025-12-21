@@ -29,7 +29,7 @@ public class CreateProductCommandHandler(
             throw new ApplicationException(string.Join(";", validationResult.Errors.Select(er => er.ErrorMessage)));
         }
 
-        List<IFormFile> validImages = [.. request.ProductRequest.ProductImages.Where(img => _fileService.IsValid(img).Success)];
+        List<IFormFile> validImages = [.. request.ProductRequest.Images.Where(img => _fileService.IsValid(img).Success)];
 
         var product = new Product
         {
@@ -41,7 +41,6 @@ public class CreateProductCommandHandler(
         };
 
         _productRepository.Add(product);
-
 
         IList<FileResource> fileResources = await _fileService.UploadFilesAsync(validImages, product.Id, nameof(Product));
         if (fileResources.Any())
