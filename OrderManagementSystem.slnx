@@ -1,0 +1,14 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/api/">
+    <Project Path="api/Application.UnitTests/Application.UnitTests.csproj" />
+    <Project Path="api/OrderMS.Api/OrderMS.Api.csproj" />
+    <Project Path="api/OrderMS.Application/OrderMS.Application.csproj" />
+    <Project Path="api/OrderMS.Domain/OrderMS.Domain.csproj" />
+    <Project Path="api/OrderMS.Infrastructure/OrderMS.Infrastructure.csproj" />
+  </Folder>
+</Solution>

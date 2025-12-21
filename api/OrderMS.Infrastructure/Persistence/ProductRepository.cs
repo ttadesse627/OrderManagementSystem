@@ -72,7 +72,7 @@ public class ProductRepository(ApplicationDbContext context) : CommonRepository<
         return new PaginatedResult<Product>
         {
             Items = items,
-            PageNumber = pageNumber,
+            CurrentPage = pageNumber,
             PageSize = pageSize,
             TotalCount = totalCount
         };

@@ -28,8 +28,8 @@ bld/
 project.lock.json
 project.fragment.lock.json
 artifacts/
-appsettings.Development.json
-
+api/OrderMS.Api/appsettings.Development.json
+uploads/*
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
