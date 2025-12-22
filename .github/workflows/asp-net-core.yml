@@ -29,3 +29,6 @@ jobs:
 
     - name: Test
       run: dotnet test OrderManagementSystem.slnx --no-build --verbosity normal
+    
+    - name: Run Api project
+      run: dotnet run --project api/OrderManagementSystem.Api/OrderManagementSystem.Api.csproj --no-build
