@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using OrderMS.Application.AppServices.Interfaces;
-using OrderMS.Application.Services;
 using OrderMS.Domain.Entities;
 using OrderMS.Domain.Utilities;
 using OrderMS.Infrastructure.Persistence;
@@ -30,7 +29,7 @@ public static class ServiceContainer
 
     public static IServiceCollection ConfigureDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("PostgresqlConnection")
+        var connectionString = configuration.GetConnectionString("PostgresqlRemoteConnection")
             ?? throw new InvalidOperationException("Connection string for PostgreSQL not found.");
 
         var redisConnectionString = configuration.GetConnectionString("RedisConnection")
@@ -44,7 +43,12 @@ public static class ServiceContainer
             //     mySqlOptions => mySqlOptions.EnableRetryOnFailure()
             // ).EnableSensitiveDataLogging();
 
-            options.UseNpgsql(connectionString);
+            options.UseNpgsql(connectionString,
+                npgsqlOptions => npgsqlOptions.EnableRetryOnFailure(
+                                                    maxRetryCount: 5,
+                                                    maxRetryDelay: TimeSpan.FromSeconds(10),
+                                                    errorCodesToAdd: null))
+                                            .EnableSensitiveDataLogging();
         }, ServiceLifetime.Scoped);
 
         var remoteRedisConnection = Environment.GetEnvironmentVariable("REDIS_CONNECTION")

@@ -34,7 +34,10 @@ public class CreateUserCommandHandler(
             Address = request.RegisterRequest.Address
         };
 
-        if (!request.RegisterRequest.Roles.Any())
+        bool rolesWereEmpty = !request.RegisterRequest.Roles.Any();
+
+
+        if (rolesWereEmpty)
         {
             request.RegisterRequest.Roles.Add("Customer");
         }
@@ -45,14 +48,6 @@ public class CreateUserCommandHandler(
                             request.RegisterRequest.Password
                         );
 
-        Customer customer = new();
-        if (!request.RegisterRequest.Roles.Any())
-        {
-            customer.UserId = user.Id;
-            _customerRepository.Add(customer);
-            await _customerRepository.SaveChangesAsync(cancellationToken);
-        }
-
         if (!createResult.Success)
         {
             return new ApiResponse<AuthResponse>
@@ -60,6 +55,14 @@ public class CreateUserCommandHandler(
                 Success = false,
                 Message = string.Join(", ", createResult.Errors)
             };
+        }
+
+        Customer customer = new();
+        if (rolesWereEmpty)
+        {
+            customer.UserId = user.Id;
+            _customerRepository.Add(customer);
+            await _customerRepository.SaveChangesAsync(cancellationToken);
         }
 
         var currentUserId = _userResolverService.GetUserId();

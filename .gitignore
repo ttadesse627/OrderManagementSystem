@@ -29,7 +29,9 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 api/OrderMS.Api/appsettings.Development.json
-uploads/*
+
+api/OrderMS.Api/wwwroot/uploads/*
+!api/OrderMS.Api/wwwroot/uploads/.gitkeep
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 

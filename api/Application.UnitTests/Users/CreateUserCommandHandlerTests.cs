@@ -74,10 +74,21 @@ namespace Application.UnitTests.Users
             var request = new CreateUserCommand(BuildValidRequest(new List<string>()));
 
             _identityServiceMock
-                .Setup(x => x.CreateUserAsync(It.IsAny<ApplicationUser>(), It.IsAny<IList<string>>(), It.IsAny<string>()))
-                .ReturnsAsync(new ApiResponse<int> { Success = true });
+                .Setup(x => x.CreateUserAsync(
+                    It.IsAny<ApplicationUser>(),
+                    It.Is<IList<string>>(roles => roles.Contains("Customer")), // Verify "Customer" role is added
+                    It.IsAny<string>()))
+                .ReturnsAsync(new ApiResponse<int> { Success = true, Data = 123 }); // Added Data = userId
 
+            // Act
             await _handler.Handle(request, CancellationToken.None);
+
+            _identityServiceMock.Verify(
+                x => x.CreateUserAsync(
+                    It.IsAny<ApplicationUser>(),
+                    It.Is<IList<string>>(roles => roles.Contains("Customer")),
+                    It.IsAny<string>()),
+                Times.Once);
 
             _customerRepositoryMock.Verify(x => x.Add(It.IsAny<Customer>()), Times.Once);
             _customerRepositoryMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
