@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OrderMS.Application.AppServices.Interfaces;
 using OrderMS.Application.Dtos.Common.Responses;
 using OrderMS.Application.Dtos.Products.Requests;
 using OrderMS.Application.Dtos.Products.Responses;
@@ -11,9 +12,10 @@ namespace OrderMS.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductController(ILogger<ProductController> logger) : ApiControllerBase
+public class ProductController(ILogger<ProductController> logger, IClientService clientService) : ApiControllerBase
 {
     private readonly ILogger<ProductController> _logger = logger;
+    private readonly IClientService _clientService = clientService;
 
     [Authorize(Roles = "Admin, Seller")]
     [HttpPost("create")]
@@ -50,5 +52,12 @@ public class ProductController(ILogger<ProductController> logger) : ApiControlle
     public async Task<ActionResult<ApiResponse<string>>> Delete(Guid id)
     {
         return Ok(await _sender.Send(new DeleteProductCommand(id)));
+    }
+
+    [Authorize(Roles = "Admin, Seller")]
+    [HttpGet("warehouse-products", Name = "WarehouseProducts")]
+    public async Task<ActionResult<List<ProductResponse>>> WarehouseProducts()
+    {
+        return Ok(await _clientService.WarehouseProducts());
     }
 }

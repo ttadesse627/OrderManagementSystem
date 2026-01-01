@@ -12,6 +12,16 @@ public static class ServiceContainer
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ServiceContainer).Assembly));
 
         services.AddTransient<IOrderCalculationService, OrderCalculationService>();
+        services.AddScoped<IClientService, ClientService>();
+
+        services.AddHttpClient("ProductsClient", config =>
+        {
+            config.BaseAddress = new Uri("https://temporal-warehouse.fly.dev/api/");
+            config.Timeout = TimeSpan.FromSeconds(45);
+            config.DefaultRequestHeaders.Clear();
+        });
+
+        services.AddHttpClient<ProductsClient>();
         services.AddHostedService<FileProcessorService>();
         services.AddHostedService<QueuedHostedService>();
         return services;

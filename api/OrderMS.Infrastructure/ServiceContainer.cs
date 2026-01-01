@@ -29,7 +29,7 @@ public static class ServiceContainer
 
     public static IServiceCollection ConfigureDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("PostgresqlRemoteConnection")
+        var connectionString = configuration.GetConnectionString("PostgresqlConnection")
             ?? throw new InvalidOperationException("Connection string for PostgreSQL not found.");
 
         var redisConnectionString = configuration.GetConnectionString("RedisConnection")
