@@ -1,5 +1,7 @@
+import { UUID } from "crypto";
+
 export interface Product {
-  id: number;
+  id: UUID;
   name: string;
   description: string;
   price: number;

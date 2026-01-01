@@ -1,12 +1,6 @@
-export interface RegisterRequest {
-  firstName: string;
-  lastName: string;
-  address: string;
-  roles: string[];  // Empty array for customers
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+import { UUID } from "crypto";
+
+export type UserRole = 'Customer' | 'Seller' | 'Admin';
 
 export interface LoginRequest {
   email: string;
@@ -14,22 +8,61 @@ export interface LoginRequest {
 }
 
 export interface AuthResponse {
-  userId: string;  // Guid as string
-  customerId: string;  // Guid as string
+  id: UUID;
   email: string;
   firstName: string;
   lastName: string;
+  address: string;
+  role: UserRole;
   token: string;
+  refreshToken: string;
 }
 
-// Update existing User interface
 export interface User {
-  userId: string;  // Changed from id: number
-  customerId: string;  // New field
+  id: UUID;
   email: string;
   firstName: string;
   lastName: string;
-  address?: string;  // Optional since it's not in AuthResponse
-  isLoggedIn: boolean;
-  token?: string;
+  role: UserRole | null;
+  avatar?: string;
+  phone?: string;
+  address?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  firstName: string;
+  lastName: string;
+  address: string;
+  roles: UserRole[];
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface UserDto {
+  userId: UUID; 
+  email: string;
+  firstName: string;
+  lastName: string;
+  address?: string;
+  role: UserRole | null;
+}
+
+export interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
 }

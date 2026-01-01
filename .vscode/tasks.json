@@ -1,0 +1,27 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "dotnet",
+			"task": "build C:\\Users\\Tesfaye\\.vscode\\Projects\\OrderManagementSystem\\api\\OrderMS.Api\\OrderMS.Api.csproj",
+			"file": "C:\\Users\\Tesfaye\\.vscode\\Projects\\OrderManagementSystem\\api\\OrderMS.Api\\OrderMS.Api.csproj",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "dotnet: build C:\\Users\\Tesfaye\\.vscode\\Projects\\OrderManagementSystem\\api\\OrderMS.Api\\OrderMS.Api.csproj"
+		},
+		{
+			"type": "dotnet",
+			"task": "build",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "dotnet: build"
+		},
+		{
+			"type": "dotnet",
+			"task": "watch OrderMS.Api",
+			"file": "C:\\Users\\Tesfaye\\.vscode\\Projects\\OrderManagementSystem\\api\\OrderMS.Api\\OrderMS.Api.csproj",
+			"problemMatcher": [],
+			"label": "dotnet: watch OrderMS.Api"
+		}
+	]
+}

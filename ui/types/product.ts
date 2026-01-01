@@ -1,11 +1,6 @@
-export interface ItemRequest {
-  name: string;
-  price: number;
-  stockQuantity: number;
-  categoryId: string;
-}
+import { UUID } from "crypto";
 
-export interface Category {
+export interface CategoryRequest {
   id: string;
   name: string;
 }
@@ -21,7 +16,7 @@ export interface Item {
 
 
 export interface ProductDto {
-  id: string; // Guid
+  id: UUID; //
   name: string;
   price: number;
   stockQuantity: number;
@@ -30,7 +25,7 @@ export interface ProductDto {
 }
 
 export interface CategoryDto {
-  id: string;
+  id: UUID;
   name: string;
   description?: string;
 }
@@ -62,3 +57,67 @@ export interface CartProduct {
   category: string;
   stock: number;
 }
+
+export interface ProductCreateRequest {
+  name: string;
+  price: number;
+  stockQuantity: number;
+  categoryId: string;
+  image: File;
+}
+
+export interface ProductResponse {
+  id: UUID;
+  name: string;
+  price: number;
+  stockQuantity: number;
+  category: string;
+  imageUrl: string;
+}
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
+
+//
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: string;
+  images: string[];
+  sellerId: string;
+  seller?: {
+    id: string;
+    name: string;
+  };
+  averageRating?: number;
+  reviewCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateProductDto {
+  name: string;
+  description: string;
+  price: number;
+  stockQuantity: number;
+  categoryId: UUID;
+  images: File[];
+}
+
+export interface ProductDetailDto {
+  id: UUID;
+  name: string;
+  price: number;
+  stockQuantity: number;
+  category?: CategoryDto;
+  imageUrls: string[];
+}
+
+export interface UpdateProductDto extends Partial<CreateProductDto> {}
